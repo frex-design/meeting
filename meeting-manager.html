@@ -76,7 +76,6 @@
   .meeting-badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 500; }
   .badge-akita { background: var(--akita-light); color: var(--akita); }
   .badge-yokote { background: var(--yokote-light); color: var(--yokote); }
-  .meeting-meta { color: var(--text-muted); font-size: 12px; margin-top: 2px; }
   .card-actions { display: flex; align-items: center; gap: 8px; }
   .btn-edit { background: none; border: 1px solid var(--border); color: var(--text-muted); padding: 5px 14px; border-radius: 6px; cursor: pointer; font-family: 'Noto Sans JP', sans-serif; font-size: 12px; transition: all .2s; white-space: nowrap; }
   .btn-edit:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
@@ -137,21 +136,12 @@
   /* CODE BLOCK */
   .code-block { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 14px; font-family: monospace; font-size: 12px; white-space: pre-wrap; color: var(--accent); margin: 12px 0; max-height: 260px; overflow-y: auto; }
 
-  /* ── カスタムカレンダー ── */
+  /* カスタムカレンダー */
   .date-picker-wrap { position: relative; }
-  .date-display {
-    width: 100%; background: var(--bg2); border: 1px solid var(--border); color: var(--text);
-    padding: 10px 14px; border-radius: 8px; font-family: 'Noto Sans JP', sans-serif; font-size: 13px;
-    cursor: pointer; display: flex; align-items: center; justify-content: space-between;
-    transition: border-color .2s, box-shadow .2s; user-select: none;
-  }
+  .date-display { width: 100%; background: var(--bg2); border: 1px solid var(--border); color: var(--text); padding: 10px 14px; border-radius: 8px; font-family: 'Noto Sans JP', sans-serif; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: border-color .2s, box-shadow .2s; user-select: none; }
   .date-display:hover, .date-display.open { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
   .date-display .cal-icon { color: var(--text-muted); font-size: 15px; }
-  .cal-popup {
-    display: none; position: absolute; top: calc(100% + 6px); left: 0;
-    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(44,36,22,.12); z-index: 200; padding: 16px; min-width: 280px;
-  }
+  .cal-popup { display: none; position: absolute; top: calc(100% + 6px); left: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 8px 32px rgba(44,36,22,.12); z-index: 200; padding: 16px; min-width: 280px; }
   .cal-popup.open { display: block; }
   .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
   .cal-header-label { font-weight: 700; font-size: 14px; color: var(--text); }
@@ -161,19 +151,15 @@
   .cal-dow { text-align: center; font-size: 11px; font-weight: 700; color: var(--text-muted); padding: 4px 0 6px; letter-spacing: .5px; }
   .cal-dow.sun { color: var(--danger); }
   .cal-dow.sat { color: var(--akita); }
-  .cal-day {
-    text-align: center; padding: 6px 2px; font-size: 13px; border-radius: 6px;
-    cursor: pointer; transition: all .15s; color: var(--text);
-  }
+  .cal-day { text-align: center; padding: 6px 2px; font-size: 13px; border-radius: 6px; cursor: pointer; transition: all .15s; color: var(--text); }
   .cal-day:hover { background: var(--accent-light); color: var(--accent); }
-  .cal-day.other-month { color: var(--border2); }
+  .cal-day.other-month { color: var(--border2); pointer-events: none; }
   .cal-day.today { font-weight: 700; color: var(--accent); }
   .cal-day.selected { background: var(--accent); color: #fff !important; font-weight: 700; }
   .cal-day.thursday { background: var(--accent-light); }
   .cal-day.thursday.selected { background: var(--accent); }
   .cal-day.sunday { color: var(--danger); }
   .cal-day.saturday { color: var(--akita); }
-  .cal-day.empty { cursor: default; }
 </style>
 </head>
 <body>
@@ -267,7 +253,6 @@ CREATE POLICY "allow_all_members" ON meeting_members FOR ALL USING (true) WITH C
         </div>
         <div class="field">
           <label>ミーティング日</label>
-          <!-- カスタムカレンダー -->
           <div class="date-picker-wrap" id="date-picker-wrap">
             <div class="date-display" id="date-display" onclick="toggleCal()">
               <span id="date-display-text">日付を選択</span>
@@ -282,7 +267,6 @@ CREATE POLICY "allow_all_members" ON meeting_members FOR ALL USING (true) WITH C
               <div class="cal-grid" id="cal-grid"></div>
             </div>
           </div>
-          <!-- hidden value holder -->
           <input type="hidden" id="f-date">
         </div>
       </div>
@@ -310,10 +294,8 @@ var MEMBERS = {
 var sbClient = null;
 var currentOffice = 'akita';
 var editingId = null;
-
-/* ── カレンダー状態 ── */
 var calYear = 0, calMonth = 0;
-var selectedDate = ''; // 'YYYY-MM-DD'
+var selectedDate = '';
 
 window.addEventListener('DOMContentLoaded', function() {
   var url = localStorage.getItem('sb_url');
@@ -328,8 +310,6 @@ window.addEventListener('DOMContentLoaded', function() {
   }
   initCal();
   renderMemberFields();
-
-  // カレンダー外クリックで閉じる
   document.addEventListener('click', function(e) {
     var wrap = document.getElementById('date-picker-wrap');
     if (wrap && !wrap.contains(e.target)) closeCal();
@@ -348,8 +328,8 @@ function initCal() {
 }
 
 function setSelectedDate(y, m, d) {
-  var mm = String(m).padStart(2,'0');
-  var dd = String(d).padStart(2,'0');
+  var mm = String(m).padStart(2, '0');
+  var dd = String(d).padStart(2, '0');
   selectedDate = y + '-' + mm + '-' + dd;
   document.getElementById('f-date').value = selectedDate;
   document.getElementById('date-display-text').textContent = y + '年' + m + '月' + d + '日';
@@ -359,9 +339,9 @@ function setSelectedDate(y, m, d) {
 function toggleCal() {
   var popup = document.getElementById('cal-popup');
   var display = document.getElementById('date-display');
-  var isOpen = popup.classList.contains('open');
-  if (isOpen) { closeCal(); }
-  else {
+  if (popup.classList.contains('open')) {
+    closeCal();
+  } else {
     popup.classList.add('open');
     display.classList.add('open');
     renderCalGrid();
@@ -382,58 +362,39 @@ function calMove(dir) {
 
 function renderCalGrid() {
   var DAYS = ['日','月','火','水','木','金','土'];
-  var today = new Date();
-  today.setHours(0,0,0,0);
-
+  var today = new Date(); today.setHours(0,0,0,0);
   document.getElementById('cal-header-label').textContent = calYear + '年 ' + (calMonth + 1) + '月';
-
   var grid = document.getElementById('cal-grid');
   var html = '';
-
-  // 曜日ヘッダー
   var dowClasses = ['sun','','','','','','sat'];
   for (var i = 0; i < 7; i++) {
     html += '<div class="cal-dow ' + dowClasses[i] + '">' + DAYS[i] + '</div>';
   }
-
-  // 月の最初の日の曜日
   var firstDay = new Date(calYear, calMonth, 1).getDay();
-  // 月の最終日
   var lastDate = new Date(calYear, calMonth + 1, 0).getDate();
-  // 前月の最終日
   var prevLastDate = new Date(calYear, calMonth, 0).getDate();
-
-  // 前月の空白マス
   for (var i = 0; i < firstDay; i++) {
-    var d = prevLastDate - firstDay + 1 + i;
-    html += '<div class="cal-day other-month empty">' + d + '</div>';
+    html += '<div class="cal-day other-month">' + (prevLastDate - firstDay + 1 + i) + '</div>';
   }
-
-  // 当月のマス
   for (var d = 1; d <= lastDate; d++) {
     var thisDate = new Date(calYear, calMonth, d);
     var dow = thisDate.getDay();
-    var mm = String(calMonth + 1).padStart(2,'0');
-    var dd = String(d).padStart(2,'0');
+    var mm = String(calMonth + 1).padStart(2, '0');
+    var dd = String(d).padStart(2, '0');
     var dateStr = calYear + '-' + mm + '-' + dd;
-
     var cls = 'cal-day';
     if (dow === 0) cls += ' sunday';
     if (dow === 6) cls += ' saturday';
     if (dow === 4) cls += ' thursday';
     if (thisDate.getTime() === today.getTime()) cls += ' today';
     if (dateStr === selectedDate) cls += ' selected';
-
     html += '<div class="' + cls + '" onclick="pickDate(' + calYear + ',' + (calMonth+1) + ',' + d + ')">' + d + '</div>';
   }
-
-  // 次月の空白マス
   var total = firstDay + lastDate;
   var remaining = total % 7 === 0 ? 0 : 7 - (total % 7);
   for (var i = 1; i <= remaining; i++) {
-    html += '<div class="cal-day other-month empty">' + i + '</div>';
+    html += '<div class="cal-day other-month">' + i + '</div>';
   }
-
   grid.innerHTML = html;
 }
 
@@ -516,25 +477,43 @@ function loadMeetings() {
 
 function renderCard(m) {
   var d = new Date(m.meeting_date + 'T00:00:00');
-  var ds = d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日（木）';
-  var ol = m.office==='akita'?'秋田事業所':'横手事業所';
-  var bc = m.office==='akita'?'badge-akita':'badge-yokote';
-  var sc = 'office-stripe-'+m.office;
+  var ds = d.getFullYear() + '年' + (d.getMonth()+1) + '月' + d.getDate() + '日（木）';
+  var ol = m.office === 'akita' ? '秋田事業所' : '横手事業所';
+  var bc = m.office === 'akita' ? 'badge-akita' : 'badge-yokote';
+  var sc = 'office-stripe-' + m.office;
   var mems = m.meeting_members || [];
   var order = MEMBERS[m.office] || [];
-  mems.sort(function(a,b){ return order.indexOf(a.member_name) - order.indexOf(b.member_name); });
+  mems.sort(function(a, b) { return order.indexOf(a.member_name) - order.indexOf(b.member_name); });
   var rows = mems.map(function(mem) {
-    var p = mem.progress||0;
-    var pc = p>=80?'prog-high':p>=40?'prog-mid':'prog-low';
-    return '<tr><td><strong>'+esc(mem.member_name)+'</strong></td><td>'+esc(mem.current_work||'—')+'</td><td><div class="prog-val">'+p+'%</div><div class="progress-bar"><div class="progress-fill '+pc+'" style="width:'+p+'%"></div></div></td><td>'+esc(mem.next_plan||'—')+'</td></tr>';
+    var p = mem.progress || 0;
+    var pc = p >= 80 ? 'prog-high' : p >= 40 ? 'prog-mid' : 'prog-low';
+    return '<tr>'
+      + '<td><strong>' + esc(mem.member_name) + '</strong></td>'
+      + '<td>' + esc(mem.current_work || '—') + '</td>'
+      + '<td><div class="prog-val">' + p + '%</div><div class="progress-bar"><div class="progress-fill ' + pc + '" style="width:' + p + '%"></div></div></td>'
+      + '<td>' + esc(mem.next_plan || '—') + '</td>'
+      + '</tr>';
   }).join('');
-  var note = m.note?'<div class="meeting-note"><strong>📌 メモ：</strong> '+esc(m.note)+'</div>':'';
-  return '<div class="meeting-card '+sc+'"><div class="meeting-card-header" onclick="toggleCard(\'card-'+m.id+'\')"><div><div class="meeting-date">'+ds+'</div></div><span class="meeting-badge '+bc+'">'+ol+'</span><div class="card-actions"><button class="btn-edit" onclick="event.stopPropagation();startEdit(\''+m.id+'\')">✏️ 編集</button><span class="expand-icon" id="icon-card-'+m.id+'">▼</span></div></div><div class="meeting-body" id="card-'+m.id+'"><div class="member-table-wrap"><table class="member-table"><thead><tr><th>氏名</th><th>今週の作業状況</th><th>進捗率</th><th>来週の作業予定</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+note+'</div></div>';
+  var note = m.note ? '<div class="meeting-note"><strong>📌 メモ：</strong> ' + esc(m.note) + '</div>' : '';
+  return '<div class="meeting-card ' + sc + '">'
+    + '<div class="meeting-card-header" onclick="toggleCard(\'card-' + m.id + '\')">'
+    + '<div><div class="meeting-date">' + ds + '</div></div>'
+    + '<span class="meeting-badge ' + bc + '">' + ol + '</span>'
+    + '<div class="card-actions">'
+    + '<button class="btn-edit" onclick="event.stopPropagation();startEdit(\'' + m.id + '\')">✏️ 編集</button>'
+    + '<span class="expand-icon" id="icon-card-' + m.id + '">▼</span>'
+    + '</div>'
+    + '</div>'
+    + '<div class="meeting-body" id="card-' + m.id + '">'
+    + '<div class="member-table-wrap"><table class="member-table"><thead><tr><th>氏名</th><th>今週の作業状況</th><th>進捗率</th><th>来週の作業予定</th></tr></thead><tbody>' + rows + '</tbody></table></div>'
+    + note
+    + '</div>'
+    + '</div>';
 }
 
 function toggleCard(id) {
   document.getElementById(id).classList.toggle('open');
-  document.getElementById('icon-'+id).classList.toggle('open');
+  document.getElementById('icon-' + id).classList.toggle('open');
 }
 
 function startEdit(id) {
@@ -547,20 +526,16 @@ function startEdit(id) {
     document.getElementById('btn-delete').style.display = 'inline-block';
     document.getElementById('f-office').value = m.office;
     document.getElementById('f-office').disabled = true;
-
-    // カレンダーに日付をセット
     var parts = m.meeting_date.split('-');
     calYear  = parseInt(parts[0]);
     calMonth = parseInt(parts[1]) - 1;
     setSelectedDate(parseInt(parts[0]), parseInt(parts[1]), parseInt(parts[2]));
-
     document.getElementById('f-note').value = m.note || '';
     renderMemberFields();
-    var mems = m.meeting_members || [];
-    mems.forEach(function(mem) {
-      var wEl = document.getElementById('work-'+mem.member_name);
-      var pEl = document.getElementById('prog-'+mem.member_name);
-      var nEl = document.getElementById('next-'+mem.member_name);
+    (m.meeting_members || []).forEach(function(mem) {
+      var wEl = document.getElementById('work-' + mem.member_name);
+      var pEl = document.getElementById('prog-' + mem.member_name);
+      var nEl = document.getElementById('next-' + mem.member_name);
       if (wEl) wEl.value = mem.current_work || '';
       if (pEl) pEl.value = mem.progress || 0;
       if (nEl) nEl.value = mem.next_plan || '';
@@ -574,10 +549,15 @@ function startEdit(id) {
 function renderMemberFields() {
   var office = document.getElementById('f-office').value;
   var mems = MEMBERS[office];
-  var label = office==='akita'?'秋田事業所':'横手事業所';
-  document.getElementById('members-section-label').textContent = '👥 '+label+' メンバー別作業状況';
+  var label = office === 'akita' ? '秋田事業所' : '横手事業所';
+  document.getElementById('members-section-label').textContent = '👥 ' + label + ' メンバー別作業状況';
   document.getElementById('member-fields').innerHTML = mems.map(function(name) {
-    return '<div class="member-row"><div class="member-name-label">'+name+'</div><div class="field-sm"><label>今週の作業状況</label><textarea id="work-'+name+'" placeholder="作業内容..." rows="2"></textarea></div><div class="field-sm"><label>進捗率 (%)</label><input type="number" id="prog-'+name+'" min="0" max="100" value="0"></div><div class="field-sm"><label>来週の作業予定</label><textarea id="next-'+name+'" placeholder="予定内容..." rows="2"></textarea></div></div>';
+    return '<div class="member-row">'
+      + '<div class="member-name-label">' + name + '</div>'
+      + '<div class="field-sm"><label>今週の作業状況</label><textarea id="work-' + name + '" placeholder="作業内容..." rows="2"></textarea></div>'
+      + '<div class="field-sm"><label>進捗率 (%)</label><input type="number" id="prog-' + name + '" min="0" max="100" value="0"></div>'
+      + '<div class="field-sm"><label>来週の作業予定</label><textarea id="next-' + name + '" placeholder="予定内容..." rows="2"></textarea></div>'
+      + '</div>';
   }).join('');
 }
 
@@ -590,19 +570,18 @@ function saveMeeting() {
   var members = MEMBERS[office].map(function(name) {
     return {
       member_name:  name,
-      current_work: (document.getElementById('work-'+name).value||'').trim(),
-      progress:     parseInt(document.getElementById('prog-'+name).value||'0'),
-      next_plan:    (document.getElementById('next-'+name).value||'').trim()
+      current_work: (document.getElementById('work-' + name).value || '').trim(),
+      progress:     parseInt(document.getElementById('prog-' + name).value || '0'),
+      next_plan:    (document.getElementById('next-' + name).value || '').trim()
     };
   });
   if (editingId) {
-    sbClient.from('meetings').update({meeting_date:date,note:note}).eq('id',editingId).then(function(r1) {
+    sbClient.from('meetings').update({ meeting_date: date, note: note }).eq('id', editingId).then(function(r1) {
       if (r1.error) throw r1.error;
-      return sbClient.from('meeting_members').delete().eq('meeting_id',editingId);
+      return sbClient.from('meeting_members').delete().eq('meeting_id', editingId);
     }).then(function(r2) {
       if (r2.error) throw r2.error;
-      var rows = members.map(function(m) { return Object.assign({},m,{meeting_id:editingId}); });
-      return sbClient.from('meeting_members').insert(rows);
+      return sbClient.from('meeting_members').insert(members.map(function(m) { return Object.assign({}, m, { meeting_id: editingId }); }));
     }).then(function(r3) {
       if (r3.error) throw r3.error;
       showAlert('new-alert','success','✅ ミーティング記録を更新しました！');
@@ -610,15 +589,14 @@ function saveMeeting() {
       setTimeout(function() { showPage('list'); }, 1000);
     }).catch(function(e) { showAlert('new-alert','error','更新エラー: '+(e.message||e)); });
   } else {
-    sbClient.from('meetings').insert({office:office,meeting_date:date,note:note}).select().single().then(function(r1) {
+    sbClient.from('meetings').insert({ office: office, meeting_date: date, note: note }).select().single().then(function(r1) {
       if (r1.error) throw r1.error;
-      var rows = members.map(function(m) { return Object.assign({},m,{meeting_id:r1.data.id}); });
-      return sbClient.from('meeting_members').insert(rows);
+      return sbClient.from('meeting_members').insert(members.map(function(m) { return Object.assign({}, m, { meeting_id: r1.data.id }); }));
     }).then(function(r2) {
       if (r2.error) throw r2.error;
       showAlert('new-alert','success','✅ ミーティング記録を保存しました！');
       setTimeout(function() {
-        document.getElementById('f-note').value='';
+        document.getElementById('f-note').value = '';
         renderMemberFields();
         initCal();
         editingId = null;
@@ -631,20 +609,23 @@ function saveMeeting() {
 function deleteMeeting() {
   if (!editingId) return;
   if (!confirm('このミーティング記録を削除しますか？\nこの操作は元に戻せません。')) return;
-  sbClient.from('meetings').delete().eq('id',editingId).then(function(res) {
+  sbClient.from('meetings').delete().eq('id', editingId).then(function(res) {
     if (res.error) throw res.error;
     editingId = null;
     showPage('list');
   }).catch(function(e) { showAlert('new-alert','error','削除エラー: '+(e.message||e)); });
 }
 
-function showAlert(id,type,msg) {
-  var el=document.getElementById(id);
-  if(!el)return;
-  el.innerHTML='<div class="alert alert-'+type+'">'+msg+'</div>';
-  if(type==='success')setTimeout(function(){el.innerHTML='';},3000);
+function showAlert(id, type, msg) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML = '<div class="alert alert-' + type + '">' + msg + '</div>';
+  if (type === 'success') setTimeout(function() { el.innerHTML = ''; }, 3000);
 }
 
 function esc(str) {
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
 }
+</script>
+</body>
+</html>
