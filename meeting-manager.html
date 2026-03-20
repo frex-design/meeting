@@ -54,12 +54,12 @@
   .logo { display: flex; align-items: baseline; gap: 12px; }
   .logo-main {
     font-family: 'Noto Sans JP', sans-serif;
-    font-size: 20px;
+    font-size: 16px;
     font-weight: 700;
     color: var(--accent);
-    letter-spacing: 2px;
+    letter-spacing: 1.5px;
   }
-  .logo-main span { font-weight: 300; color: var(--text-muted); font-size: 20px; letter-spacing: 2px; }
+  .logo-main span { font-weight: 700; color: var(--accent); font-size: 16px; letter-spacing: 1.5px; }
   .logo-sub { font-size: 11px; color: var(--text-muted); letter-spacing: 1.5px; border-left: 1px solid var(--border2); padding-left: 12px; }
   .header-nav { display: flex; gap: 6px; }
   .nav-btn {
@@ -75,6 +75,7 @@
   }
   .nav-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
   .nav-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-light); font-weight: 500; }
+  .nav-btn-sm { padding: 7px 10px; font-size: 13px; min-width: 0; }
 
   /* SETUP */
   #setup-screen {
@@ -272,9 +273,9 @@
     <span class="logo-sub">週次ミーティング管理</span>
   </div>
   <nav class="header-nav">
-    <button class="nav-btn active" id="btn-list" onclick="showPage('list')">📋 ミーティング一覧</button>
     <button class="nav-btn" id="btn-new" onclick="startNew()">✏️ 新規入力</button>
-    <button class="nav-btn" id="btn-setup" onclick="showPage('setup')">⚙️ 設定</button>
+    <button class="nav-btn active" id="btn-list" onclick="showPage('list')">📋 ミーティング一覧</button>
+    <button class="nav-btn nav-btn-sm" id="btn-setup" onclick="showPage('setup')">⚙</button>
   </nav>
 </header>
 
@@ -647,4 +648,3 @@ function esc(str) {
 }
 </script>
 </body>
-</html>
