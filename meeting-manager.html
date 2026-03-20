@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>週次ミーティング管理 | 株式会社フレックスデザイン</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2430;
+    --border: #30363d;
+    --accent: #e8a838;
+    --accent2: #f0c060;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --akita: #3b8bd0;
+    --yokote: #2ea86e;
+    --danger: #f85149;
+    --success: #3fb950;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 14px;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--surface);
+    border-bottom: 2px solid var(--accent);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .logo-main {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 2px;
+    color: var(--accent);
+  }
+  .logo-sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+  }
+  .header-nav {
+    display: flex;
+    gap: 8px;
+  }
+  .nav-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 6px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 13px;
+    transition: all .2s;
+  }
+  .nav-btn:hover, .nav-btn.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(232,168,56,.08);
+  }
+
+  /* ── SETUP SCREEN ── */
+  #setup-screen {
+    max-width: 560px;
+    margin: 80px auto;
+    padding: 40px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+  #setup-screen h2 {
+    color: var(--accent);
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+  #setup-screen p {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-bottom: 24px;
+    line-height: 1.7;
+  }
+  .field { margin-bottom: 16px; }
+  .field label {
+    display: block;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    letter-spacing: .5px;
+  }
+  .field input, .field textarea, .field select {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 13px;
+    transition: border-color .2s;
+    outline: none;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus {
+    border-color: var(--accent);
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    padding: 11px 28px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-family: 'Noto Sans JP', sans-serif;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background .2s;
+    width: 100%;
+  }
+  .btn-primary:hover { background: var(--accent2); }
+
+  /* ── MAIN LAYOUT ── */
+  .main {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 28px 24px;
+  }
+
+  /* ── PAGE TITLE BAR ── */
+  .page-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .page-title {
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .page-title span { color: var(--accent); }
+
+  /* ── OFFICE TABS ── */
+  .office-tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 24px;
+  }
+  .office-tab {
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+    border-radius: 7px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all .2s;
+    color: var(--text-muted);
+    border: none;
+    background: none;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+  .office-tab.akita.active { background: var(--akita); color: #fff; }
+  .office-tab.yokote.active { background: var(--yokote); color: #fff; }
+  .office-tab:not(.active):hover { color: var(--text); background: var(--surface2); }
+
+  /* ── MEETING LIST ── */
+  .meeting-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .meeting-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: border-color .2s;
+  }
+  .meeting-card:hover { border-color: var(--accent); }
+  .meeting-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    cursor: pointer;
+    gap: 12px;
+  }
+  .meeting-date {
+    font-weight: 700;
+    font-size: 15px;
+  }
+  .meeting-badge {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+  .badge-akita { background: rgba(59,139,208,.2); color: var(--akita); }
+  .badge-yokote { background: rgba(46,168,110,.2); color: var(--yokote); }
+  .meeting-meta { color: var(--text-muted); font-size: 12px; }
+  .expand-icon { color: var(--text-muted); transition: transform .2s; }
+  .expand-icon.open { transform: rotate(180deg); }
+  .meeting-body {
+    display: none;
+    border-top: 1px solid var(--border);
+  }
+  .meeting-body.open { display: block; }
+
+  /* ── MEMBER TABLE ── */
+  .member-table-wrap { padding: 0 20px 20px; overflow-x: auto; }
+  .member-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-top: 16px;
+  }
+  .member-table th {
+    text-align: left;
+    padding: 8px 12px;
+    background: var(--surface2);
+    color: var(--text-muted);
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: .5px;
+    border-bottom: 1px solid var(--border);
+  }
+  .member-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.6;
+  }
+  .member-table tr:last-child td { border-bottom: none; }
+  .progress-bar {
+    width: 120px;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 4px;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width .4s;
+  }
+  .prog-low { background: var(--danger); }
+  .prog-mid { background: var(--accent); }
+  .prog-high { background: var(--success); }
+  .prog-val { font-size: 11px; color: var(--text-muted); }
+  .meeting-note {
+    padding: 12px 20px;
+    background: var(--surface2);
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 12px;
+    line-height: 1.7;
+  }
+  .meeting-note strong { color: var(--text); }
+
+  /* ── NEW MEETING FORM ── */
+  #new-meeting-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+  }
+  .form-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: var(--accent);
+  }
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  @media (max-width: 640px) { .form-row { grid-template-columns: 1fr; } }
+  .section-label {
+    font-size: 13px;
+    font-weight: 700;
+    padding: 10px 0 6px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+    color: var(--text-muted);
+    letter-spacing: .5px;
+  }
+  .member-row {
+    display: grid;
+    grid-template-columns: 80px 1fr 80px 1fr;
+    gap: 10px;
+    align-items: start;
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--border);
+  }
+  @media (max-width: 700px) {
+    .member-row { grid-template-columns: 1fr 1fr; }
+  }
+  .member-name-label {
+    display: flex;
+    align-items: center;
+    font-weight: 700;
+    font-size: 14px;
+    padding-top: 8px;
+  }
+  .field-sm input, .field-sm textarea, .field-sm select {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 13px;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .field-sm input:focus, .field-sm textarea:focus {
+    border-color: var(--accent);
+  }
+  .field-sm textarea { resize: vertical; min-height: 60px; }
+  .field-sm label {
+    display: block;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+  .btn-row { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+  .btn-cancel {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 10px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 14px;
+  }
+  .btn-cancel:hover { border-color: var(--text-muted); color: var(--text); }
+  .btn-save {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    padding: 10px 28px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-family: 'Noto Sans JP', sans-serif;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background .2s;
+  }
+  .btn-save:hover { background: var(--accent2); }
+
+  /* ── ALERTS ── */
+  .alert {
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+  .alert-error { background: rgba(248,81,73,.12); border: 1px solid var(--danger); color: var(--danger); }
+  .alert-success { background: rgba(63,185,80,.12); border: 1px solid var(--success); color: var(--success); }
+
+  /* ── EMPTY STATE ── */
+  .empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+  }
+  .empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+
+  /* ── LOADING ── */
+  .spinner {
+    display: inline-block;
+    width: 16px; height: 16px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin .6s linear infinite;
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── OFFICE COLOR ACCENTS ── */
+  .office-stripe-akita { border-left: 3px solid var(--akita); }
+  .office-stripe-yokote { border-left: 3px solid var(--yokote); }
+
+  /* ── DB SETUP INFO ── */
+  .code-block {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    font-family: monospace;
+    font-size: 12px;
+    white-space: pre-wrap;
+    color: #7ee787;
+    margin: 12px 0;
+    max-height: 260px;
+    overflow-y: auto;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="logo">
+    <span class="logo-main">FLEX DESIGN</span>
+    <span class="logo-sub">週次ミーティング管理</span>
+  </div>
+  <nav class="header-nav">
+    <button class="nav-btn active" id="btn-list" onclick="showPage('list')">📋 ミーティング一覧</button>
+    <button class="nav-btn" id="btn-new" onclick="showPage('new')">✏️ 新規入力</button>
+    <button class="nav-btn" id="btn-setup" onclick="showPage('setup')">⚙️ 設定</button>
+  </nav>
+</header>
+
+<!-- SETUP SCREEN -->
+<div id="setup-screen" style="display:none;">
+  <h2>⚙️ Supabase 接続設定</h2>
+  <p>Supabase プロジェクトの URL と anon key を入力してください。<br>
+  設定はブラウザに保存され、次回から自動で接続されます。</p>
+  <div id="setup-alert"></div>
+  <div class="field">
+    <label>SUPABASE URL</label>
+    <input type="text" id="sb-url" placeholder="https://xxxxxxxxxx.supabase.co">
+  </div>
+  <div class="field">
+    <label>SUPABASE ANON KEY</label>
+    <input type="text" id="sb-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+  </div>
+  <button class="btn-primary" onclick="saveConfig()">接続して保存</button>
+
+  <div style="margin-top:32px;">
+    <div class="section-label">📄 Supabase SQL セットアップ（初回のみ実行）</div>
+    <p style="color:var(--text-muted);font-size:12px;margin-bottom:8px;">Supabase の SQL Editor で以下を実行してください：</p>
+    <div class="code-block">-- ミーティングテーブル
+CREATE TABLE meetings (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  office text NOT NULL CHECK (office IN ('akita', 'yokote')),
+  meeting_date date NOT NULL,
+  note text,
+  created_at timestamptz DEFAULT now()
+);
+
+-- メンバー作業記録テーブル
+CREATE TABLE meeting_members (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  meeting_id uuid REFERENCES meetings(id) ON DELETE CASCADE,
+  member_name text NOT NULL,
+  current_work text,
+  progress int CHECK (progress BETWEEN 0 AND 100),
+  next_plan text
+);
+
+-- 全員が読み書き可能（RLS無効化 or 適宜設定）
+ALTER TABLE meetings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE meeting_members ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "allow_all_meetings" ON meetings FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "allow_all_members" ON meeting_members FOR ALL USING (true) WITH CHECK (true);</div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div class="main" id="app-main" style="display:none;">
+
+  <!-- LIST PAGE -->
+  <div id="page-list">
+    <div class="page-bar">
+      <div class="page-title">ミーティング一覧 <span>/ 週次記録</span></div>
+    </div>
+    <div class="office-tabs">
+      <button class="office-tab akita active" onclick="setOffice('akita', this)">🏢 秋田事業所</button>
+      <button class="office-tab yokote" onclick="setOffice('yokote', this)">🏢 横手事業所</button>
+    </div>
+    <div id="list-alert"></div>
+    <div id="meeting-list" class="meeting-list">
+      <div class="empty">
+        <div class="spinner"></div> 読み込み中...
+      </div>
+    </div>
+  </div>
+
+  <!-- NEW MEETING PAGE -->
+  <div id="page-new" style="display:none;">
+    <div class="page-bar">
+      <div class="page-title">新規ミーティング入力</div>
+    </div>
+    <div id="new-alert"></div>
+    <div id="new-meeting-section" class="new-meeting-section">
+      <div class="form-row">
+        <div class="field">
+          <label>事業所</label>
+          <select id="f-office" onchange="renderMemberFields()">
+            <option value="akita">秋田事業所</option>
+            <option value="yokote">横手事業所</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>ミーティング日 (木曜日)</label>
+          <input type="date" id="f-date">
+        </div>
+      </div>
+      <div class="field">
+        <label>全体メモ（議題・連絡事項など）</label>
+        <textarea rows="3" id="f-note" placeholder="全体への連絡、共有事項など..."></textarea>
+      </div>
+
+      <div class="section-label" id="members-section-label">👥 メンバー別作業状況</div>
+      <div id="member-fields"></div>
+
+      <div class="btn-row">
+        <button class="btn-cancel" onclick="showPage('list')">キャンセル</button>
+        <button class="btn-save" onclick="saveMeeting()">💾 保存する</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────────
+const MEMBERS = {
+  akita:  ['二木', '渡部', '藤岡', '本間', '堀井', '智恵'],
+  yokote: ['加瀬谷', '星野', '佐藤', '沓澤']
+};
+
+let supabase = null;
+let currentOffice = 'akita';
+let cachedMeetings = {};
+
+// ── INIT ─────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  const url = localStorage.getItem('sb_url');
+  const key = localStorage.getItem('sb_key');
+  if (url && key) {
+    initSupabase(url, key);
+    document.getElementById('sb-url').value = url;
+    document.getElementById('sb-key').value = key;
+    showPage('list');
+  } else {
+    showPage('setup');
+  }
+  setDefaultDate();
+  renderMemberFields();
+});
+
+function initSupabase(url, key) {
+  supabase = window.supabase.createClient(url, key);
+}
+
+// ── SETUP ────────────────────────────────────────────────────────
+async function saveConfig() {
+  const url = document.getElementById('sb-url').value.trim();
+  const key = document.getElementById('sb-key').value.trim();
+  if (!url || !key) {
+    showAlert('setup-alert', 'error', 'URLとAnon Keyを両方入力してください。');
+    return;
+  }
+  initSupabase(url, key);
+  // 接続テスト
+  try {
+    const { error } = await supabase.from('meetings').select('id').limit(1);
+    if (error) throw error;
+    localStorage.setItem('sb_url', url);
+    localStorage.setItem('sb_key', key);
+    showAlert('setup-alert', 'success', '✅ 接続成功！設定を保存しました。');
+    setTimeout(() => showPage('list'), 1200);
+  } catch (e) {
+    showAlert('setup-alert', 'error', '接続エラー: ' + (e.message || e));
+  }
+}
+
+// ── PAGE NAV ─────────────────────────────────────────────────────
+function showPage(p) {
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('app-main').style.display = 'none';
+
+  document.getElementById('btn-list').classList.remove('active');
+  document.getElementById('btn-new').classList.remove('active');
+  document.getElementById('btn-setup').classList.remove('active');
+
+  if (p === 'setup') {
+    document.getElementById('setup-screen').style.display = 'block';
+    document.getElementById('btn-setup').classList.add('active');
+  } else {
+    document.getElementById('app-main').style.display = 'block';
+    document.getElementById('page-list').style.display  = p === 'list'  ? 'block' : 'none';
+    document.getElementById('page-new').style.display   = p === 'new'   ? 'block' : 'none';
+    if (p === 'list') { document.getElementById('btn-list').classList.add('active'); loadMeetings(); }
+    if (p === 'new')  { document.getElementById('btn-new').classList.add('active'); }
+  }
+}
+
+// ── OFFICE TABS ──────────────────────────────────────────────────
+function setOffice(office, el) {
+  currentOffice = office;
+  document.querySelectorAll('.office-tab').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  loadMeetings();
+}
+
+// ── LOAD MEETINGS ─────────────────────────────────────────────────
+async function loadMeetings() {
+  if (!supabase) { showPage('setup'); return; }
+  const listEl = document.getElementById('meeting-list');
+  listEl.innerHTML = '<div class="empty"><span class="spinner"></span> 読み込み中...</div>';
+
+  try {
+    const { data: meetings, error } = await supabase
+      .from('meetings')
+      .select('*, meeting_members(*)')
+      .eq('office', currentOffice)
+      .order('meeting_date', { ascending: false });
+
+    if (error) throw error;
+
+    if (!meetings || meetings.length === 0) {
+      listEl.innerHTML = `<div class="empty">
+        <div class="empty-icon">📋</div>
+        <div class="empty-title">まだ記録がありません</div>
+        <p style="font-size:13px;color:var(--text-muted)">「新規入力」からミーティング内容を登録しましょう</p>
+      </div>`;
+      return;
+    }
+
+    listEl.innerHTML = meetings.map(m => renderMeetingCard(m)).join('');
+  } catch (e) {
+    showAlert('list-alert', 'error', 'データ取得エラー: ' + (e.message || e));
+    listEl.innerHTML = '';
+  }
+}
+
+function renderMeetingCard(m) {
+  const date = new Date(m.meeting_date);
+  const dateStr = `${date.getFullYear()}年${date.getMonth()+1}月${date.getDate()}日（木）`;
+  const officeLabel = m.office === 'akita' ? '秋田事業所' : '横手事業所';
+  const badgeClass = m.office === 'akita' ? 'badge-akita' : 'badge-yokote';
+  const stripeClass = `office-stripe-${m.office}`;
+  const members = m.meeting_members || [];
+
+  const rows = members.map(mem => {
+    const p = mem.progress ?? 0;
+    const progClass = p >= 80 ? 'prog-high' : p >= 40 ? 'prog-mid' : 'prog-low';
+    return `<tr>
+      <td><strong>${mem.member_name}</strong></td>
+      <td>${esc(mem.current_work || '—')}</td>
+      <td>
+        <div class="prog-val">${p}%</div>
+        <div class="progress-bar"><div class="progress-fill ${progClass}" style="width:${p}%"></div></div>
+      </td>
+      <td>${esc(mem.next_plan || '—')}</td>
+    </tr>`;
+  }).join('');
+
+  const noteHtml = m.note ? `<div class="meeting-note"><strong>📌 メモ：</strong> ${esc(m.note)}</div>` : '';
+
+  return `<div class="meeting-card ${stripeClass}">
+    <div class="meeting-card-header" onclick="toggleCard('card-${m.id}')">
+      <div>
+        <div class="meeting-date">${dateStr}</div>
+        <div class="meeting-meta">${members.length}名が記録</div>
+      </div>
+      <span class="meeting-badge ${badgeClass}">${officeLabel}</span>
+      <span class="expand-icon" id="icon-card-${m.id}">▼</span>
+    </div>
+    <div class="meeting-body" id="card-${m.id}">
+      <div class="member-table-wrap">
+        <table class="member-table">
+          <thead>
+            <tr>
+              <th>氏名</th>
+              <th>今週の作業状況</th>
+              <th>進捗率</th>
+              <th>来週の作業予定</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+      ${noteHtml}
+    </div>
+  </div>`;
+}
+
+function toggleCard(id) {
+  const body = document.getElementById(id);
+  const icon = document.getElementById('icon-' + id);
+  body.classList.toggle('open');
+  icon.classList.toggle('open');
+}
+
+// ── NEW MEETING FORM ──────────────────────────────────────────────
+function renderMemberFields() {
+  const office = document.getElementById('f-office').value;
+  const members = MEMBERS[office];
+  const label = office === 'akita' ? '秋田事業所' : '横手事業所';
+  document.getElementById('members-section-label').textContent = `👥 ${label} メンバー別作業状況`;
+
+  document.getElementById('member-fields').innerHTML = members.map(name => `
+    <div class="member-row">
+      <div class="member-name-label">${name}</div>
+      <div class="field-sm">
+        <label>今週の作業状況</label>
+        <textarea id="work-${name}" placeholder="作業内容..." rows="2"></textarea>
+      </div>
+      <div class="field-sm">
+        <label>進捗率 (%)</label>
+        <input type="number" id="prog-${name}" min="0" max="100" value="0" placeholder="0-100">
+      </div>
+      <div class="field-sm">
+        <label>来週の作業予定</label>
+        <textarea id="next-${name}" placeholder="予定内容..." rows="2"></textarea>
+      </div>
+    </div>
+  `).join('');
+}
+
+function setDefaultDate() {
+  // 直近の木曜日をデフォルトに
+  const today = new Date();
+  const day = today.getDay();
+  const diff = (day <= 4) ? (4 - day) : (4 - day + 7);
+  const thursday = new Date(today);
+  thursday.setDate(today.getDate() - (day === 4 ? 0 : (day < 4 ? day - 4 + 7 : day - 4)));
+  // 今週の木曜
+  const thisThursday = new Date(today);
+  const dayOfWeek = today.getDay();
+  const daysToThursday = (4 - dayOfWeek + 7) % 7;
+  const lastThursday = new Date(today);
+  lastThursday.setDate(today.getDate() - (dayOfWeek >= 4 ? dayOfWeek - 4 : dayOfWeek + 3));
+  document.getElementById('f-date').value = lastThursday.toISOString().split('T')[0];
+}
+
+async function saveMeeting() {
+  if (!supabase) { showPage('setup'); return; }
+
+  const office = document.getElementById('f-office').value;
+  const date   = document.getElementById('f-date').value;
+  const note   = document.getElementById('f-note').value.trim();
+
+  if (!date) { showAlert('new-alert', 'error', '日付を選択してください。'); return; }
+
+  const members = MEMBERS[office].map(name => ({
+    member_name: name,
+    current_work: (document.getElementById('work-' + name)?.value || '').trim(),
+    progress: parseInt(document.getElementById('prog-' + name)?.value || '0'),
+    next_plan: (document.getElementById('next-' + name)?.value || '').trim()
+  }));
+
+  try {
+    const { data: meet, error: e1 } = await supabase
+      .from('meetings')
+      .insert({ office, meeting_date: date, note })
+      .select().single();
+    if (e1) throw e1;
+
+    const rows = members.map(m => ({ ...m, meeting_id: meet.id }));
+    const { error: e2 } = await supabase.from('meeting_members').insert(rows);
+    if (e2) throw e2;
+
+    showAlert('new-alert', 'success', '✅ ミーティング記録を保存しました！');
+    setTimeout(() => {
+      document.getElementById('f-note').value = '';
+      renderMemberFields();
+      setDefaultDate();
+      showPage('list');
+    }, 1000);
+  } catch (e) {
+    showAlert('new-alert', 'error', '保存エラー: ' + (e.message || e));
+  }
+}
+
+// ── UTILS ─────────────────────────────────────────────────────────
+function showAlert(id, type, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+  if (type === 'success') setTimeout(() => { el.innerHTML = ''; }, 3000);
+}
+
+function esc(str) {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\n/g,'<br>');
+}
+</script>
+</body>
+</html>
