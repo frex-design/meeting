@@ -8,25 +8,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f5f0e8;
-    --bg2: #ede8df;
-    --surface: #faf7f2;
-    --surface2: #f0ebe0;
-    --border: #d9d0c0;
-    --border2: #c8bfae;
-    --accent: #8b6f4e;
-    --accent2: #a8845f;
-    --accent-light: rgba(139,111,78,.1);
-    --text: #2c2416;
-    --text-muted: #7a6e5f;
-    --akita: #4a7fa5;
-    --akita-light: rgba(74,127,165,.12);
-    --yokote: #4a8f6a;
-    --yokote-light: rgba(74,143,106,.12);
-    --danger: #b85450;
-    --danger-light: rgba(184,84,80,.1);
-    --success: #4a7a55;
-    --success-light: rgba(74,122,85,.1);
+    --bg: #f5f0e8; --bg2: #ede8df; --surface: #faf7f2; --surface2: #f0ebe0;
+    --border: #d9d0c0; --border2: #c8bfae;
+    --accent: #8b6f4e; --accent2: #a8845f; --accent-light: rgba(139,111,78,.1);
+    --text: #2c2416; --text-muted: #7a6e5f;
+    --akita: #4a7fa5; --akita-light: rgba(74,127,165,.12);
+    --yokote: #4a8f6a; --yokote-light: rgba(74,143,106,.12);
+    --danger: #b85450; --danger-light: rgba(184,84,80,.1);
+    --success: #4a7a55; --success-light: rgba(74,122,85,.1);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: 'Noto Sans JP', sans-serif; font-size: 14px; min-height: 100vh; }
@@ -40,7 +29,7 @@
   .nav-btn { background: none; border: 1px solid var(--border); color: var(--text-muted); padding: 7px 16px; border-radius: 6px; cursor: pointer; font-family: 'Noto Sans JP', sans-serif; font-size: 13px; transition: all .2s; }
   .nav-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
   .nav-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-light); font-weight: 500; }
-  .nav-btn-sm { padding: 7px 10px; font-size: 13px; min-width: 0; }
+  .nav-btn-sm { padding: 7px 10px; }
 
   /* SETUP */
   #setup-screen { max-width: 580px; margin: 60px auto; padding: 44px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 4px 24px rgba(139,111,78,.08); }
@@ -55,7 +44,7 @@
 
   /* MAIN */
   .main { max-width: 1280px; margin: 0 auto; padding: 32px 28px; }
-  .page-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+  .page-bar { display: flex; align-items: center; margin-bottom: 24px; }
   .page-title { font-size: 20px; font-weight: 700; }
 
   /* OFFICE TABS */
@@ -76,9 +65,11 @@
   .meeting-badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 500; }
   .badge-akita { background: var(--akita-light); color: var(--akita); }
   .badge-yokote { background: var(--yokote-light); color: var(--yokote); }
-  .card-actions { display: flex; align-items: center; gap: 8px; }
-  .btn-edit { background: none; border: 1px solid var(--border); color: var(--text-muted); padding: 5px 14px; border-radius: 6px; cursor: pointer; font-family: 'Noto Sans JP', sans-serif; font-size: 12px; transition: all .2s; white-space: nowrap; }
+  .card-actions { display: flex; align-items: center; gap: 6px; }
+  .btn-edit { background: none; border: 1px solid var(--border); color: var(--text-muted); padding: 5px 12px; border-radius: 6px; cursor: pointer; font-family: 'Noto Sans JP', sans-serif; font-size: 12px; transition: all .2s; white-space: nowrap; }
   .btn-edit:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+  .btn-copy { background: none; border: 1px solid var(--yokote); color: var(--yokote); padding: 5px 12px; border-radius: 6px; cursor: pointer; font-family: 'Noto Sans JP', sans-serif; font-size: 12px; transition: all .2s; white-space: nowrap; }
+  .btn-copy:hover { background: var(--yokote-light); }
   .expand-icon { color: var(--text-muted); transition: transform .2s; font-size: 12px; }
   .expand-icon.open { transform: rotate(180deg); }
   .meeting-body { display: none; border-top: 1px solid var(--border); }
@@ -92,9 +83,7 @@
   .member-table tr:last-child td { border-bottom: none; }
   .progress-bar { width: 120px; height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; margin-top: 5px; }
   .progress-fill { height: 100%; border-radius: 3px; }
-  .prog-low { background: var(--danger); }
-  .prog-mid { background: var(--accent); }
-  .prog-high { background: var(--success); }
+  .prog-low { background: var(--danger); } .prog-mid { background: var(--accent); } .prog-high { background: var(--success); }
   .prog-val { font-size: 11px; color: var(--text-muted); }
   .meeting-note { padding: 12px 20px; background: var(--bg2); border-top: 1px solid var(--border); color: var(--text-muted); font-size: 12px; line-height: 1.8; }
   .meeting-note strong { color: var(--text); }
@@ -104,9 +93,9 @@
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
   @media (max-width: 640px) { .form-row { grid-template-columns: 1fr; } }
   .section-label { font-size: 12px; font-weight: 700; padding: 10px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 16px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; }
-  .member-row { display: grid; grid-template-columns: 80px 1fr 80px 1fr; gap: 10px; align-items: start; padding: 12px 0; border-bottom: 1px dashed var(--border); }
+  .member-row { display: grid; grid-template-columns: 90px 1fr 80px 1fr; gap: 10px; align-items: start; padding: 12px 0; border-bottom: 1px dashed var(--border); }
   @media (max-width: 700px) { .member-row { grid-template-columns: 1fr 1fr; } }
-  .member-name-label { display: flex; align-items: center; font-weight: 700; font-size: 14px; padding-top: 8px; }
+  .member-name-label { display: flex; align-items: center; font-weight: 700; font-size: 13px; padding-top: 8px; }
   .field-sm label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: 500; }
   .field-sm input, .field-sm textarea { width: 100%; background: var(--bg2); border: 1px solid var(--border); color: var(--text); padding: 8px 10px; border-radius: 6px; font-family: 'Noto Sans JP', sans-serif; font-size: 13px; outline: none; transition: border-color .2s, box-shadow .2s; }
   .field-sm input:focus, .field-sm textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-light); }
@@ -124,19 +113,17 @@
   .alert-error { background: var(--danger-light); border: 1px solid var(--danger); color: var(--danger); }
   .alert-success { background: var(--success-light); border: 1px solid var(--success); color: var(--success); }
 
-  /* EMPTY */
+  /* EMPTY / SPINNER */
   .empty { text-align: center; padding: 60px 20px; color: var(--text-muted); }
   .empty-icon { font-size: 40px; margin-bottom: 12px; }
   .empty-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; color: var(--text); }
-
-  /* SPINNER */
   .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .6s linear infinite; vertical-align: middle; margin-right: 8px; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
   /* CODE BLOCK */
   .code-block { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 14px; font-family: monospace; font-size: 12px; white-space: pre-wrap; color: var(--accent); margin: 12px 0; max-height: 260px; overflow-y: auto; }
 
-  /* カスタムカレンダー */
+  /* カスタムカレンダー共通 */
   .date-picker-wrap { position: relative; }
   .date-display { width: 100%; background: var(--bg2); border: 1px solid var(--border); color: var(--text); padding: 10px 14px; border-radius: 8px; font-family: 'Noto Sans JP', sans-serif; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: border-color .2s, box-shadow .2s; user-select: none; }
   .date-display:hover, .date-display.open { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
@@ -149,8 +136,7 @@
   .cal-nav:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
   .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
   .cal-dow { text-align: center; font-size: 11px; font-weight: 700; color: var(--text-muted); padding: 4px 0 6px; letter-spacing: .5px; }
-  .cal-dow.sun { color: var(--danger); }
-  .cal-dow.sat { color: var(--akita); }
+  .cal-dow.sun { color: var(--danger); } .cal-dow.sat { color: var(--akita); }
   .cal-day { text-align: center; padding: 6px 2px; font-size: 13px; border-radius: 6px; cursor: pointer; transition: all .15s; color: var(--text); }
   .cal-day:hover { background: var(--accent-light); color: var(--accent); }
   .cal-day.other-month { color: var(--border2); pointer-events: none; }
@@ -158,8 +144,19 @@
   .cal-day.selected { background: var(--accent); color: #fff !important; font-weight: 700; }
   .cal-day.thursday { background: var(--accent-light); }
   .cal-day.thursday.selected { background: var(--accent); }
-  .cal-day.sunday { color: var(--danger); }
-  .cal-day.saturday { color: var(--akita); }
+  .cal-day.sunday { color: var(--danger); } .cal-day.saturday { color: var(--akita); }
+
+  /* コピーモーダル */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(44,36,22,.45); z-index: 300; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px; box-shadow: 0 12px 48px rgba(44,36,22,.16); width: 90%; max-width: 360px; }
+  .modal-title { font-size: 16px; font-weight: 700; color: var(--accent); margin-bottom: 6px; }
+  .modal-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.7; }
+  .modal-btn-row { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+  .btn-modal-cancel { background: none; border: 1px solid var(--border); color: var(--text-muted); padding: 9px 20px; border-radius: 8px; cursor: pointer; font-family: 'Noto Sans JP', sans-serif; font-size: 13px; transition: all .2s; }
+  .btn-modal-cancel:hover { border-color: var(--text-muted); color: var(--text); }
+  .btn-modal-ok { background: var(--accent); color: #fff; border: none; padding: 9px 24px; border-radius: 8px; font-weight: 700; font-family: 'Noto Sans JP', sans-serif; cursor: pointer; font-size: 13px; transition: background .2s; }
+  .btn-modal-ok:hover { background: var(--accent2); }
 </style>
 </head>
 <body>
@@ -181,14 +178,8 @@
   <h2>⚙️ Supabase 接続設定</h2>
   <p>Supabase プロジェクトの URL と anon key を入力してください。<br>設定はブラウザに保存され、次回から自動で接続されます。</p>
   <div id="setup-alert"></div>
-  <div class="field">
-    <label>SUPABASE URL</label>
-    <input type="text" id="sb-url" placeholder="https://xxxxxxxxxx.supabase.co">
-  </div>
-  <div class="field">
-    <label>SUPABASE ANON KEY</label>
-    <input type="text" id="sb-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
-  </div>
+  <div class="field"><label>SUPABASE URL</label><input type="text" id="sb-url" placeholder="https://xxxxxxxxxx.supabase.co"></div>
+  <div class="field"><label>SUPABASE ANON KEY</label><input type="text" id="sb-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."></div>
   <button class="btn-primary" onclick="saveConfig()">接続して保存</button>
   <div style="margin-top:36px;">
     <div class="section-label">📄 Supabase SQL セットアップ（初回のみ実行）</div>
@@ -212,12 +203,36 @@ CREATE TABLE meeting_members (
   next_plan text
 );
 
--- 読み書き権限の設定
 ALTER TABLE meetings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE meeting_members ENABLE ROW LEVEL SECURITY;
-
 CREATE POLICY "allow_all_meetings" ON meetings FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "allow_all_members" ON meeting_members FOR ALL USING (true) WITH CHECK (true);</div>
+  </div>
+</div>
+
+<!-- コピーモーダル -->
+<div class="modal-overlay" id="copy-modal">
+  <div class="modal">
+    <div class="modal-title">📋 コピーして作成</div>
+    <div class="modal-sub">コピー先の日付を選択してください。<br>内容をそのままコピーして新規作成します。</div>
+    <div style="position:relative;" id="copy-cal-wrap">
+      <div class="date-display" id="copy-date-display" onclick="toggleCopyCal()">
+        <span id="copy-date-text">日付を選択</span>
+        <span class="cal-icon">📅</span>
+      </div>
+      <div class="cal-popup" id="copy-cal-popup">
+        <div class="cal-header">
+          <button class="cal-nav" onclick="copyCalMove(-1)">&#8592;</button>
+          <span class="cal-header-label" id="copy-cal-label"></span>
+          <button class="cal-nav" onclick="copyCalMove(1)">&#8594;</button>
+        </div>
+        <div class="cal-grid" id="copy-cal-grid"></div>
+      </div>
+    </div>
+    <div class="modal-btn-row">
+      <button class="btn-modal-cancel" onclick="closeModal()">キャンセル</button>
+      <button class="btn-modal-ok" onclick="executeCopy()">この日付で作成</button>
+    </div>
   </div>
 </div>
 
@@ -294,8 +309,13 @@ var MEMBERS = {
 var sbClient = null;
 var currentOffice = 'akita';
 var editingId = null;
-var calYear = 0, calMonth = 0;
-var selectedDate = '';
+
+// 入力フォーム用カレンダー
+var calYear = 0, calMonth = 0, selectedDate = '';
+// コピーモーダル用カレンダー
+var copyCalYear = 0, copyCalMonth = 0, copySelectedDate = '';
+// コピー元データ
+var copySourceData = null;
 
 window.addEventListener('DOMContentLoaded', function() {
   var url = localStorage.getItem('sb_url');
@@ -313,23 +333,24 @@ window.addEventListener('DOMContentLoaded', function() {
   document.addEventListener('click', function(e) {
     var wrap = document.getElementById('date-picker-wrap');
     if (wrap && !wrap.contains(e.target)) closeCal();
+    var copyWrap = document.getElementById('copy-cal-wrap');
+    if (copyWrap && !copyWrap.contains(e.target)) closeCopyCal();
   });
 });
 
-/* ── カレンダー ── */
+/* ── 入力フォーム用カレンダー ── */
 function initCal() {
   var today = new Date();
   var dow = today.getDay();
   var last = new Date(today);
   last.setDate(today.getDate() - (dow >= 4 ? dow - 4 : dow + 3));
-  calYear  = last.getFullYear();
+  calYear = last.getFullYear();
   calMonth = last.getMonth();
   setSelectedDate(last.getFullYear(), last.getMonth() + 1, last.getDate());
 }
 
 function setSelectedDate(y, m, d) {
-  var mm = String(m).padStart(2, '0');
-  var dd = String(d).padStart(2, '0');
+  var mm = String(m).padStart(2,'0'), dd = String(d).padStart(2,'0');
   selectedDate = y + '-' + mm + '-' + dd;
   document.getElementById('f-date').value = selectedDate;
   document.getElementById('date-display-text').textContent = y + '年' + m + '月' + d + '日';
@@ -339,79 +360,105 @@ function setSelectedDate(y, m, d) {
 function toggleCal() {
   var popup = document.getElementById('cal-popup');
   var display = document.getElementById('date-display');
-  if (popup.classList.contains('open')) {
-    closeCal();
-  } else {
-    popup.classList.add('open');
-    display.classList.add('open');
-    renderCalGrid();
-  }
+  if (popup.classList.contains('open')) { closeCal(); }
+  else { popup.classList.add('open'); display.classList.add('open'); renderCalGrid(); }
 }
-
 function closeCal() {
   document.getElementById('cal-popup').classList.remove('open');
   document.getElementById('date-display').classList.remove('open');
 }
-
 function calMove(dir) {
   calMonth += dir;
   if (calMonth > 11) { calMonth = 0; calYear++; }
   if (calMonth < 0)  { calMonth = 11; calYear--; }
   renderCalGrid();
 }
-
 function renderCalGrid() {
+  buildCalGrid(calYear, calMonth, selectedDate, 'cal-header-label', 'cal-grid', 'pickDate');
+}
+function pickDate(y, m, d) {
+  calYear = y; calMonth = m - 1;
+  setSelectedDate(y, m, d);
+  closeCal();
+}
+
+/* ── コピーモーダル用カレンダー ── */
+function initCopyCal() {
+  var today = new Date();
+  var dow = today.getDay();
+  var next = new Date(today);
+  next.setDate(today.getDate() + (dow <= 4 ? 4 - dow : 11 - dow));
+  copyCalYear = next.getFullYear();
+  copyCalMonth = next.getMonth();
+  setCopySelectedDate(next.getFullYear(), next.getMonth() + 1, next.getDate());
+}
+function setCopySelectedDate(y, m, d) {
+  var mm = String(m).padStart(2,'0'), dd = String(d).padStart(2,'0');
+  copySelectedDate = y + '-' + mm + '-' + dd;
+  document.getElementById('copy-date-text').textContent = y + '年' + m + '月' + d + '日';
+  renderCopyCalGrid();
+}
+function toggleCopyCal() {
+  var popup = document.getElementById('copy-cal-popup');
+  var display = document.getElementById('copy-date-display');
+  if (popup.classList.contains('open')) { closeCopyCal(); }
+  else { popup.classList.add('open'); display.classList.add('open'); renderCopyCalGrid(); }
+}
+function closeCopyCal() {
+  document.getElementById('copy-cal-popup').classList.remove('open');
+  document.getElementById('copy-date-display').classList.remove('open');
+}
+function copyCalMove(dir) {
+  copyCalMonth += dir;
+  if (copyCalMonth > 11) { copyCalMonth = 0; copyCalYear++; }
+  if (copyCalMonth < 0)  { copyCalMonth = 11; copyCalYear--; }
+  renderCopyCalGrid();
+}
+function renderCopyCalGrid() {
+  buildCalGrid(copyCalYear, copyCalMonth, copySelectedDate, 'copy-cal-label', 'copy-cal-grid', 'pickCopyDate');
+}
+function pickCopyDate(y, m, d) {
+  copyCalYear = y; copyCalMonth = m - 1;
+  setCopySelectedDate(y, m, d);
+  closeCopyCal();
+}
+
+/* ── 共通カレンダー描画 ── */
+function buildCalGrid(year, month, selected, labelId, gridId, pickFn) {
   var DAYS = ['日','月','火','水','木','金','土'];
   var today = new Date(); today.setHours(0,0,0,0);
-  document.getElementById('cal-header-label').textContent = calYear + '年 ' + (calMonth + 1) + '月';
-  var grid = document.getElementById('cal-grid');
+  document.getElementById(labelId).textContent = year + '年 ' + (month + 1) + '月';
   var html = '';
-  var dowClasses = ['sun','','','','','','sat'];
-  for (var i = 0; i < 7; i++) {
-    html += '<div class="cal-dow ' + dowClasses[i] + '">' + DAYS[i] + '</div>';
-  }
-  var firstDay = new Date(calYear, calMonth, 1).getDay();
-  var lastDate = new Date(calYear, calMonth + 1, 0).getDate();
-  var prevLastDate = new Date(calYear, calMonth, 0).getDate();
-  for (var i = 0; i < firstDay; i++) {
-    html += '<div class="cal-day other-month">' + (prevLastDate - firstDay + 1 + i) + '</div>';
-  }
+  var dowCls = ['sun','','','','','','sat'];
+  for (var i = 0; i < 7; i++) html += '<div class="cal-dow ' + dowCls[i] + '">' + DAYS[i] + '</div>';
+  var firstDay = new Date(year, month, 1).getDay();
+  var lastDate = new Date(year, month + 1, 0).getDate();
+  var prevLast = new Date(year, month, 0).getDate();
+  for (var i = 0; i < firstDay; i++) html += '<div class="cal-day other-month">' + (prevLast - firstDay + 1 + i) + '</div>';
   for (var d = 1; d <= lastDate; d++) {
-    var thisDate = new Date(calYear, calMonth, d);
-    var dow = thisDate.getDay();
-    var mm = String(calMonth + 1).padStart(2, '0');
-    var dd = String(d).padStart(2, '0');
-    var dateStr = calYear + '-' + mm + '-' + dd;
+    var dt = new Date(year, month, d);
+    var dow = dt.getDay();
+    var mm = String(month + 1).padStart(2,'0'), dd = String(d).padStart(2,'0');
+    var ds = year + '-' + mm + '-' + dd;
     var cls = 'cal-day';
     if (dow === 0) cls += ' sunday';
     if (dow === 6) cls += ' saturday';
     if (dow === 4) cls += ' thursday';
-    if (thisDate.getTime() === today.getTime()) cls += ' today';
-    if (dateStr === selectedDate) cls += ' selected';
-    html += '<div class="' + cls + '" onclick="pickDate(' + calYear + ',' + (calMonth+1) + ',' + d + ')">' + d + '</div>';
+    if (dt.getTime() === today.getTime()) cls += ' today';
+    if (ds === selected) cls += ' selected';
+    html += '<div class="' + cls + '" onclick="' + pickFn + '(' + year + ',' + (month+1) + ',' + d + ')">' + d + '</div>';
   }
   var total = firstDay + lastDate;
-  var remaining = total % 7 === 0 ? 0 : 7 - (total % 7);
-  for (var i = 1; i <= remaining; i++) {
-    html += '<div class="cal-day other-month">' + i + '</div>';
-  }
-  grid.innerHTML = html;
-}
-
-function pickDate(y, m, d) {
-  calYear  = y;
-  calMonth = m - 1;
-  setSelectedDate(y, m, d);
-  closeCal();
+  var rem = total % 7 === 0 ? 0 : 7 - (total % 7);
+  for (var i = 1; i <= rem; i++) html += '<div class="cal-day other-month">' + i + '</div>';
+  document.getElementById(gridId).innerHTML = html;
 }
 
 /* ── APP ── */
 function showPage(p) {
   document.getElementById('setup-screen').style.display = 'none';
   document.getElementById('app-main').style.display = 'none';
-  document.getElementById('btn-list').classList.remove('active');
-  document.getElementById('btn-new').classList.remove('active');
-  document.getElementById('btn-setup').classList.remove('active');
+  ['btn-list','btn-new','btn-setup'].forEach(function(id){ document.getElementById(id).classList.remove('active'); });
   if (p === 'setup') {
     document.getElementById('setup-screen').style.display = 'block';
     document.getElementById('btn-setup').classList.add('active');
@@ -445,14 +492,12 @@ function saveConfig() {
     localStorage.setItem('sb_key', key);
     showAlert('setup-alert','success','✅ 接続成功！設定を保存しました。');
     setTimeout(function() { showPage('list'); }, 1200);
-  }).catch(function(e) {
-    showAlert('setup-alert','error','接続エラー: ' + (e.message || e));
-  });
+  }).catch(function(e) { showAlert('setup-alert','error','接続エラー: '+(e.message||e)); });
 }
 
 function setOffice(office, el) {
   currentOffice = office;
-  document.querySelectorAll('.office-tab').forEach(function(b) { b.classList.remove('active'); });
+  document.querySelectorAll('.office-tab').forEach(function(b){ b.classList.remove('active'); });
   el.classList.add('active');
   loadMeetings();
 }
@@ -468,11 +513,8 @@ function loadMeetings() {
       listEl.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">まだ記録がありません</div><p style="font-size:13px;">「新規入力」からミーティング内容を登録しましょう</p></div>';
       return;
     }
-    listEl.innerHTML = meetings.map(function(m) { return renderCard(m); }).join('');
-  }).catch(function(e) {
-    showAlert('list-alert','error','データ取得エラー: '+(e.message||e));
-    listEl.innerHTML = '';
-  });
+    listEl.innerHTML = meetings.map(function(m){ return renderCard(m); }).join('');
+  }).catch(function(e) { showAlert('list-alert','error','データ取得エラー: '+(e.message||e)); listEl.innerHTML = ''; });
 }
 
 function renderCard(m) {
@@ -483,16 +525,11 @@ function renderCard(m) {
   var sc = 'office-stripe-' + m.office;
   var mems = m.meeting_members || [];
   var order = MEMBERS[m.office] || [];
-  mems.sort(function(a, b) { return order.indexOf(a.member_name) - order.indexOf(b.member_name); });
+  mems.sort(function(a,b){ return order.indexOf(a.member_name) - order.indexOf(b.member_name); });
   var rows = mems.map(function(mem) {
     var p = mem.progress || 0;
     var pc = p >= 80 ? 'prog-high' : p >= 40 ? 'prog-mid' : 'prog-low';
-    return '<tr>'
-      + '<td><strong>' + esc(mem.member_name) + '</strong></td>'
-      + '<td>' + esc(mem.current_work || '—') + '</td>'
-      + '<td><div class="prog-val">' + p + '%</div><div class="progress-bar"><div class="progress-fill ' + pc + '" style="width:' + p + '%"></div></div></td>'
-      + '<td>' + esc(mem.next_plan || '—') + '</td>'
-      + '</tr>';
+    return '<tr><td><strong>' + esc(mem.member_name) + '</strong></td><td>' + esc(mem.current_work||'—') + '</td><td><div class="prog-val">' + p + '%</div><div class="progress-bar"><div class="progress-fill ' + pc + '" style="width:' + p + '%"></div></div></td><td>' + esc(mem.next_plan||'—') + '</td></tr>';
   }).join('');
   var note = m.note ? '<div class="meeting-note"><strong>📌 メモ：</strong> ' + esc(m.note) + '</div>' : '';
   return '<div class="meeting-card ' + sc + '">'
@@ -500,15 +537,13 @@ function renderCard(m) {
     + '<div><div class="meeting-date">' + ds + '</div></div>'
     + '<span class="meeting-badge ' + bc + '">' + ol + '</span>'
     + '<div class="card-actions">'
+    + '<button class="btn-copy" onclick="event.stopPropagation();openCopyModal(\'' + m.id + '\')">📋 コピーして作成</button>'
     + '<button class="btn-edit" onclick="event.stopPropagation();startEdit(\'' + m.id + '\')">✏️ 編集</button>'
     + '<span class="expand-icon" id="icon-card-' + m.id + '">▼</span>'
-    + '</div>'
-    + '</div>'
+    + '</div></div>'
     + '<div class="meeting-body" id="card-' + m.id + '">'
     + '<div class="member-table-wrap"><table class="member-table"><thead><tr><th>氏名</th><th>今週の作業状況</th><th>進捗率</th><th>来週の作業予定</th></tr></thead><tbody>' + rows + '</tbody></table></div>'
-    + note
-    + '</div>'
-    + '</div>';
+    + note + '</div></div>';
 }
 
 function toggleCard(id) {
@@ -516,6 +551,44 @@ function toggleCard(id) {
   document.getElementById('icon-' + id).classList.toggle('open');
 }
 
+/* ── コピーモーダル ── */
+function openCopyModal(id) {
+  if (!sbClient) return;
+  sbClient.from('meetings').select('*, meeting_members(*)').eq('id', id).single().then(function(res) {
+    if (res.error) throw res.error;
+    copySourceData = res.data;
+    initCopyCal();
+    document.getElementById('copy-modal').classList.add('open');
+  }).catch(function(e) { showAlert('list-alert','error','エラー: '+(e.message||e)); });
+}
+
+function closeModal() {
+  document.getElementById('copy-modal').classList.remove('open');
+  copySourceData = null;
+  copySelectedDate = '';
+}
+
+function executeCopy() {
+  if (!copySourceData || !copySelectedDate) {
+    alert('日付を選択してください。');
+    return;
+  }
+  var m = copySourceData;
+  sbClient.from('meetings').insert({ office: m.office, meeting_date: copySelectedDate, note: m.note }).select().single().then(function(r1) {
+    if (r1.error) throw r1.error;
+    var rows = (m.meeting_members || []).map(function(mem) {
+      return { meeting_id: r1.data.id, member_name: mem.member_name, current_work: mem.current_work, progress: mem.progress, next_plan: mem.next_plan };
+    });
+    return sbClient.from('meeting_members').insert(rows);
+  }).then(function(r2) {
+    if (r2.error) throw r2.error;
+    closeModal();
+    showAlert('list-alert','success','✅ コピーして作成しました！');
+    loadMeetings();
+  }).catch(function(e) { showAlert('list-alert','error','コピーエラー: '+(e.message||e)); });
+}
+
+/* ── 編集 ── */
 function startEdit(id) {
   if (!sbClient) return;
   sbClient.from('meetings').select('*, meeting_members(*)').eq('id', id).single().then(function(res) {
@@ -527,8 +600,7 @@ function startEdit(id) {
     document.getElementById('f-office').value = m.office;
     document.getElementById('f-office').disabled = true;
     var parts = m.meeting_date.split('-');
-    calYear  = parseInt(parts[0]);
-    calMonth = parseInt(parts[1]) - 1;
+    calYear = parseInt(parts[0]); calMonth = parseInt(parts[1]) - 1;
     setSelectedDate(parseInt(parts[0]), parseInt(parts[1]), parseInt(parts[2]));
     document.getElementById('f-note').value = m.note || '';
     renderMemberFields();
@@ -541,9 +613,7 @@ function startEdit(id) {
       if (nEl) nEl.value = mem.next_plan || '';
     });
     showPage('new');
-  }).catch(function(e) {
-    showAlert('list-alert','error','編集データ取得エラー: '+(e.message||e));
-  });
+  }).catch(function(e) { showAlert('list-alert','error','編集データ取得エラー: '+(e.message||e)); });
 }
 
 function renderMemberFields() {
@@ -570,57 +640,54 @@ function saveMeeting() {
   var members = MEMBERS[office].map(function(name) {
     return {
       member_name:  name,
-      current_work: (document.getElementById('work-' + name).value || '').trim(),
-      progress:     parseInt(document.getElementById('prog-' + name).value || '0'),
-      next_plan:    (document.getElementById('next-' + name).value || '').trim()
+      current_work: (document.getElementById('work-'+name).value||'').trim(),
+      progress:     parseInt(document.getElementById('prog-'+name).value||'0'),
+      next_plan:    (document.getElementById('next-'+name).value||'').trim()
     };
   });
   if (editingId) {
-    sbClient.from('meetings').update({ meeting_date: date, note: note }).eq('id', editingId).then(function(r1) {
+    sbClient.from('meetings').update({meeting_date:date,note:note}).eq('id',editingId).then(function(r1) {
       if (r1.error) throw r1.error;
-      return sbClient.from('meeting_members').delete().eq('meeting_id', editingId);
+      return sbClient.from('meeting_members').delete().eq('meeting_id',editingId);
     }).then(function(r2) {
       if (r2.error) throw r2.error;
-      return sbClient.from('meeting_members').insert(members.map(function(m) { return Object.assign({}, m, { meeting_id: editingId }); }));
+      return sbClient.from('meeting_members').insert(members.map(function(m){ return Object.assign({},m,{meeting_id:editingId}); }));
     }).then(function(r3) {
       if (r3.error) throw r3.error;
-      showAlert('new-alert','success','✅ ミーティング記録を更新しました！');
+      showAlert('new-alert','success','✅ 更新しました！');
       editingId = null;
-      setTimeout(function() { showPage('list'); }, 1000);
-    }).catch(function(e) { showAlert('new-alert','error','更新エラー: '+(e.message||e)); });
+      setTimeout(function(){ showPage('list'); }, 1000);
+    }).catch(function(e){ showAlert('new-alert','error','更新エラー: '+(e.message||e)); });
   } else {
-    sbClient.from('meetings').insert({ office: office, meeting_date: date, note: note }).select().single().then(function(r1) {
+    sbClient.from('meetings').insert({office:office,meeting_date:date,note:note}).select().single().then(function(r1) {
       if (r1.error) throw r1.error;
-      return sbClient.from('meeting_members').insert(members.map(function(m) { return Object.assign({}, m, { meeting_id: r1.data.id }); }));
+      return sbClient.from('meeting_members').insert(members.map(function(m){ return Object.assign({},m,{meeting_id:r1.data.id}); }));
     }).then(function(r2) {
       if (r2.error) throw r2.error;
-      showAlert('new-alert','success','✅ ミーティング記録を保存しました！');
-      setTimeout(function() {
-        document.getElementById('f-note').value = '';
-        renderMemberFields();
-        initCal();
-        editingId = null;
+      showAlert('new-alert','success','✅ 保存しました！');
+      setTimeout(function(){
+        document.getElementById('f-note').value='';
+        renderMemberFields(); initCal(); editingId = null;
         showPage('list');
       }, 1000);
-    }).catch(function(e) { showAlert('new-alert','error','保存エラー: '+(e.message||e)); });
+    }).catch(function(e){ showAlert('new-alert','error','保存エラー: '+(e.message||e)); });
   }
 }
 
 function deleteMeeting() {
   if (!editingId) return;
   if (!confirm('このミーティング記録を削除しますか？\nこの操作は元に戻せません。')) return;
-  sbClient.from('meetings').delete().eq('id', editingId).then(function(res) {
+  sbClient.from('meetings').delete().eq('id',editingId).then(function(res) {
     if (res.error) throw res.error;
-    editingId = null;
-    showPage('list');
-  }).catch(function(e) { showAlert('new-alert','error','削除エラー: '+(e.message||e)); });
+    editingId = null; showPage('list');
+  }).catch(function(e){ showAlert('new-alert','error','削除エラー: '+(e.message||e)); });
 }
 
 function showAlert(id, type, msg) {
   var el = document.getElementById(id);
   if (!el) return;
   el.innerHTML = '<div class="alert alert-' + type + '">' + msg + '</div>';
-  if (type === 'success') setTimeout(function() { el.innerHTML = ''; }, 3000);
+  if (type === 'success') setTimeout(function(){ el.innerHTML = ''; }, 3000);
 }
 
 function esc(str) {
