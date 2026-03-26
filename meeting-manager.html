@@ -13,7 +13,7 @@
     --accent: #8b6f4e; --accent2: #a8845f; --accent-light: rgba(139,111,78,.1);
     --text: #2c2416; --text-muted: #7a6e5f;
     --akita: #4a7fa5; --akita-light: rgba(74,127,165,.12);
-    --yokote: #4a8f6a; --yokote-light: rgba(74,143,106,.12);
+    --yokote: #d4845a; --yokote-light: rgba(212,132,90,.12);
     --danger: #b85450; --danger-light: rgba(184,84,80,.1);
     --success: #4a7a55; --success-light: rgba(74,122,85,.1);
     --notice: #7a5a9e; --notice-light: rgba(122,90,158,.1); --notice-border: rgba(122,90,158,.3);
@@ -48,37 +48,18 @@
   .page-bar { display: flex; align-items: center; margin-bottom: 24px; }
   .page-title { font-size: 20px; font-weight: 700; }
 
-  /* ── お知らせエリア ── */
+  /* お知らせ */
   .notice-area { margin-bottom: 20px; }
-  .notice-card {
-    background: var(--notice-light);
-    border: 1px solid var(--notice-border);
-    border-left: 4px solid var(--notice);
-    border-radius: 10px;
-    padding: 14px 18px;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 12px;
-  }
+  .notice-card { background: var(--notice-light); border: 1px solid var(--notice-border); border-left: 4px solid var(--notice); border-radius: 10px; padding: 14px 18px; margin-bottom: 8px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
   .notice-content { display: flex; align-items: flex-start; gap: 10px; flex: 1; }
   .notice-icon { font-size: 16px; margin-top: 1px; flex-shrink: 0; }
   .notice-text { font-size: 13px; line-height: 1.7; color: var(--text); }
   .notice-date { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
   .notice-delete { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 16px; padding: 2px 4px; border-radius: 4px; transition: all .2s; flex-shrink: 0; }
   .notice-delete:hover { color: var(--danger); background: var(--danger-light); }
-  .notice-add-btn {
-    display: flex; align-items: center; gap: 8px;
-    background: none; border: 1px dashed var(--notice-border);
-    color: var(--notice); padding: 10px 16px; border-radius: 8px;
-    cursor: pointer; font-family: 'Noto Sans JP', sans-serif; font-size: 13px;
-    transition: all .2s; width: 100%; margin-top: 4px;
-  }
+  .notice-add-btn { display: flex; align-items: center; gap: 8px; background: none; border: 1px dashed var(--notice-border); color: var(--notice); padding: 10px 16px; border-radius: 8px; cursor: pointer; font-family: 'Noto Sans JP', sans-serif; font-size: 13px; transition: all .2s; width: 100%; margin-top: 4px; }
   .notice-add-btn:hover { background: var(--notice-light); border-style: solid; }
   .notice-empty { font-size: 12px; color: var(--text-muted); padding: 8px 4px; }
-
-  /* お知らせ入力エリア */
   .notice-input-area { background: var(--notice-light); border: 1px solid var(--notice-border); border-radius: 10px; padding: 14px 16px; margin-top: 4px; }
   .notice-input-area textarea { width: 100%; background: var(--surface); border: 1px solid var(--notice-border); color: var(--text); padding: 10px 12px; border-radius: 8px; font-family: 'Noto Sans JP', sans-serif; font-size: 13px; outline: none; resize: vertical; min-height: 70px; transition: border-color .2s; }
   .notice-input-area textarea:focus { border-color: var(--notice); }
@@ -88,7 +69,7 @@
   .btn-notice-post { background: var(--notice); color: #fff; border: none; padding: 7px 20px; border-radius: 6px; font-weight: 700; font-family: 'Noto Sans JP', sans-serif; cursor: pointer; font-size: 13px; transition: background .2s; }
   .btn-notice-post:hover { background: #6a4a8e; }
 
-  /* 管理者パスワードモーダル */
+  /* モーダル共通 */
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(44,36,22,.45); z-index: 300; align-items: center; justify-content: center; }
   .modal-overlay.open { display: flex; }
   .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px; box-shadow: 0 12px 48px rgba(44,36,22,.16); width: 90%; max-width: 360px; }
@@ -177,7 +158,7 @@
   /* CODE BLOCK */
   .code-block { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 14px; font-family: monospace; font-size: 12px; white-space: pre-wrap; color: var(--accent); margin: 12px 0; max-height: 260px; overflow-y: auto; }
 
-  /* カスタムカレンダー共通 */
+  /* カスタムカレンダー */
   .date-picker-wrap { position: relative; }
   .date-display { width: 100%; background: var(--bg2); border: 1px solid var(--border); color: var(--text); padding: 10px 14px; border-radius: 8px; font-family: 'Noto Sans JP', sans-serif; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: border-color .2s, box-shadow .2s; user-select: none; }
   .date-display:hover, .date-display.open { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
@@ -305,15 +286,8 @@ CREATE POLICY "allow_all_notices" ON notices FOR ALL USING (true) WITH CHECK (tr
 
 <!-- MAIN APP -->
 <div class="main" id="app-main" style="display:none;">
-
-  <!-- LIST PAGE -->
   <div id="page-list">
-
-    <!-- ── お知らせエリア ── -->
-    <div class="notice-area" id="notice-area">
-      <!-- JSで描画 -->
-    </div>
-
+    <div class="notice-area" id="notice-area"></div>
     <div class="office-tabs" style="margin-top:0;">
       <button class="office-tab akita active" onclick="setOffice('akita', this)">🏢 秋田事業所</button>
       <button class="office-tab yokote" onclick="setOffice('yokote', this)">🏢 横手事業所</button>
@@ -324,7 +298,6 @@ CREATE POLICY "allow_all_notices" ON notices FOR ALL USING (true) WITH CHECK (tr
     </div>
   </div>
 
-  <!-- NEW / EDIT PAGE -->
   <div id="page-new" style="display:none;">
     <div class="page-bar">
       <div class="page-title" id="form-page-title">新規ミーティング入力</div>
@@ -379,51 +352,39 @@ var MEMBERS = {
   yokote: ['加瀬谷 建', '星野 健太', '佐藤 優太', '沓澤 幸']
 };
 var ADMIN_PW = '1111';
-
-var sbClient = null;
-var currentOffice = 'akita';
-var editingId = null;
-var isAdmin = false;
-var adminCallback = null;
-
-// カレンダー
+var sbClient = null, currentOffice = 'akita', editingId = null;
+var isAdmin = false, adminCallback = null;
 var calYear = 0, calMonth = 0, selectedDate = '';
-var copyCalYear = 0, copyCalMonth = 0, copySelectedDate = '';
-var copySourceData = null;
+var copyCalYear = 0, copyCalMonth = 0, copySelectedDate = '', copySourceData = null;
 
 window.addEventListener('DOMContentLoaded', function() {
-  var url = localStorage.getItem('sb_url');
-  var key = localStorage.getItem('sb_key');
+  var url = localStorage.getItem('sb_url'), key = localStorage.getItem('sb_key');
   if (url && key) {
     sbClient = window.supabase.createClient(url, key);
     document.getElementById('sb-url').value = url;
     document.getElementById('sb-key').value = key;
     showPage('list');
-  } else {
-    showPage('setup');
-  }
-  initCal();
-  renderMemberFields();
+  } else { showPage('setup'); }
+  initCal(); renderMemberFields();
   document.addEventListener('click', function(e) {
-    var wrap = document.getElementById('date-picker-wrap');
-    if (wrap && !wrap.contains(e.target)) closeCal();
-    var copyWrap = document.getElementById('copy-cal-wrap');
-    if (copyWrap && !copyWrap.contains(e.target)) closeCopyCal();
+    var w1 = document.getElementById('date-picker-wrap');
+    if (w1 && !w1.contains(e.target)) closeCal();
+    var w2 = document.getElementById('copy-cal-wrap');
+    if (w2 && !w2.contains(e.target)) closeCopyCal();
   });
 });
 
-/* ── 管理者認証 ── */
-function requireAdmin(callback) {
-  if (isAdmin) { callback(); return; }
-  adminCallback = callback;
+/* 管理者認証 */
+function requireAdmin(cb) {
+  if (isAdmin) { cb(); return; }
+  adminCallback = cb;
   document.getElementById('admin-pw-input').value = '';
   document.getElementById('pw-error').style.display = 'none';
   document.getElementById('admin-modal').classList.add('open');
   setTimeout(function(){ document.getElementById('admin-pw-input').focus(); }, 100);
 }
 function checkAdminPw() {
-  var pw = document.getElementById('admin-pw-input').value;
-  if (pw === ADMIN_PW) {
+  if (document.getElementById('admin-pw-input').value === ADMIN_PW) {
     isAdmin = true;
     document.getElementById('admin-modal').classList.remove('open');
     if (adminCallback) { adminCallback(); adminCallback = null; }
@@ -433,260 +394,173 @@ function checkAdminPw() {
     document.getElementById('admin-pw-input').focus();
   }
 }
-function closeAdminModal() {
-  document.getElementById('admin-modal').classList.remove('open');
-  adminCallback = null;
-}
+function closeAdminModal() { document.getElementById('admin-modal').classList.remove('open'); adminCallback = null; }
 
-/* ── お知らせ ── */
+/* お知らせ */
 function loadNotices() {
   if (!sbClient) return;
   sbClient.from('notices').select('*').order('created_at', { ascending: false }).then(function(res) {
-    if (res.error) { console.error(res.error); return; }
+    if (res.error) return;
     renderNotices(res.data || []);
   });
 }
-
 function renderNotices(notices) {
-  var area = document.getElementById('notice-area');
-  var html = '';
-
-  if (notices.length === 0) {
-    if (isAdmin) {
-      html = '<div class="notice-empty">お知らせはありません</div>';
-    }
-  } else {
-    notices.forEach(function(n) {
-      var d = new Date(n.created_at);
-      var ds = d.getFullYear() + '/' + (d.getMonth()+1) + '/' + d.getDate();
-      var delBtn = isAdmin ? '<button class="notice-delete" onclick="deleteNotice(\'' + n.id + '\')" title="削除">✕</button>' : '';
-      html += '<div class="notice-card">'
-        + '<div class="notice-content">'
-        + '<span class="notice-icon">📢</span>'
-        + '<div><div class="notice-text">' + esc(n.content) + '</div><div class="notice-date">' + ds + '</div></div>'
-        + '</div>'
-        + delBtn
-        + '</div>';
-    });
-  }
-
-  // 管理者なら追加ボタン表示
+  var area = document.getElementById('notice-area'), html = '';
+  if (notices.length === 0 && !isAdmin) { area.innerHTML = ''; return; }
+  notices.forEach(function(n) {
+    var d = new Date(n.created_at);
+    var ds = d.getFullYear() + '/' + (d.getMonth()+1) + '/' + d.getDate();
+    var del = isAdmin ? '<button class="notice-delete" onclick="deleteNotice(\''+n.id+'\')" title="削除">✕</button>' : '';
+    html += '<div class="notice-card"><div class="notice-content"><span class="notice-icon">📢</span><div><div class="notice-text">'+esc(n.content)+'</div><div class="notice-date">'+ds+'</div></div></div>'+del+'</div>';
+  });
   if (isAdmin) {
     html += '<button class="notice-add-btn" onclick="showNoticeInput()">＋ お知らせを追加</button>'
-          + '<div class="notice-input-area" id="notice-input-area" style="display:none;">'
-          + '<textarea id="notice-text" placeholder="お知らせ内容を入力..."></textarea>'
-          + '<div class="notice-input-btns">'
-          + '<button class="btn-notice-cancel" onclick="hideNoticeInput()">キャンセル</button>'
-          + '<button class="btn-notice-post" onclick="postNotice()">投稿する</button>'
-          + '</div></div>';
+          + '<div class="notice-input-area" id="notice-input-area" style="display:none;"><textarea id="notice-text" placeholder="お知らせ内容を入力..."></textarea><div class="notice-input-btns"><button class="btn-notice-cancel" onclick="hideNoticeInput()">キャンセル</button><button class="btn-notice-post" onclick="postNotice()">投稿する</button></div></div>';
   }
-
   area.innerHTML = html;
 }
-
-function showNoticeInput() {
-  var el = document.getElementById('notice-input-area');
-  if (el) { el.style.display = 'block'; document.getElementById('notice-text').focus(); }
-}
-function hideNoticeInput() {
-  var el = document.getElementById('notice-input-area');
-  if (el) { el.style.display = 'none'; }
-}
-
+function showNoticeInput() { var el=document.getElementById('notice-input-area'); if(el){el.style.display='block'; document.getElementById('notice-text').focus();} }
+function hideNoticeInput() { var el=document.getElementById('notice-input-area'); if(el) el.style.display='none'; }
 function postNotice() {
-  var text = (document.getElementById('notice-text').value || '').trim();
-  if (!text) return;
-  sbClient.from('notices').insert({ content: text }).then(function(res) {
-    if (res.error) { alert('投稿エラー: ' + res.error.message); return; }
-    loadNotices();
-  });
+  var text=(document.getElementById('notice-text').value||'').trim();
+  if(!text) return;
+  sbClient.from('notices').insert({content:text}).then(function(res){ if(!res.error) loadNotices(); });
 }
-
 function deleteNotice(id) {
-  if (!confirm('このお知らせを削除しますか？')) return;
-  sbClient.from('notices').delete().eq('id', id).then(function(res) {
-    if (res.error) { alert('削除エラー: ' + res.error.message); return; }
-    loadNotices();
-  });
+  if(!confirm('このお知らせを削除しますか？')) return;
+  sbClient.from('notices').delete().eq('id',id).then(function(res){ if(!res.error) loadNotices(); });
 }
 
-function toggleAdminMode() {
-  if (isAdmin) {
-    isAdmin = false;
-    loadNotices();
-  } else {
-    requireAdmin(function() { loadNotices(); });
+/* カレンダー共通 */
+function buildCalGrid(year, month, selected, labelId, gridId, pickFn) {
+  var DAYS=['日','月','火','水','木','金','土'], today=new Date(); today.setHours(0,0,0,0);
+  document.getElementById(labelId).textContent = year+'年 '+(month+1)+'月';
+  var html='', dc=['sun','','','','','','sat'];
+  for(var i=0;i<7;i++) html+='<div class="cal-dow '+dc[i]+'">'+DAYS[i]+'</div>';
+  var fd=new Date(year,month,1).getDay(), ld=new Date(year,month+1,0).getDate(), pl=new Date(year,month,0).getDate();
+  for(var i=0;i<fd;i++) html+='<div class="cal-day other-month">'+(pl-fd+1+i)+'</div>';
+  for(var d=1;d<=ld;d++){
+    var dt=new Date(year,month,d), dow=dt.getDay();
+    var mm=String(month+1).padStart(2,'0'), dd=String(d).padStart(2,'0'), ds=year+'-'+mm+'-'+dd;
+    var cls='cal-day';
+    if(dow===0) cls+=' sunday'; if(dow===6) cls+=' saturday';
+    if(dow===4) cls+=' thursday';
+    if(dt.getTime()===today.getTime()) cls+=' today';
+    if(ds===selected) cls+=' selected';
+    html+='<div class="'+cls+'" onclick="'+pickFn+'('+year+','+(month+1)+','+d+')">'+d+'</div>';
   }
+  var total=fd+ld, rem=total%7===0?0:7-(total%7);
+  for(var i=1;i<=rem;i++) html+='<div class="cal-day other-month">'+i+'</div>';
+  document.getElementById(gridId).innerHTML=html;
 }
 
-/* ── カレンダー ── */
+/* 入力フォーム用カレンダー */
 function initCal() {
-  var today = new Date();
-  var dow = today.getDay();
-  var last = new Date(today);
-  last.setDate(today.getDate() - (dow >= 4 ? dow - 4 : dow + 3));
-  calYear = last.getFullYear(); calMonth = last.getMonth();
-  setSelectedDate(last.getFullYear(), last.getMonth() + 1, last.getDate());
+  var today=new Date(), dow=today.getDay(), last=new Date(today);
+  last.setDate(today.getDate()-(dow>=4?dow-4:dow+3));
+  calYear=last.getFullYear(); calMonth=last.getMonth();
+  setSelectedDate(last.getFullYear(),last.getMonth()+1,last.getDate());
 }
-function setSelectedDate(y, m, d) {
-  var mm = String(m).padStart(2,'0'), dd = String(d).padStart(2,'0');
-  selectedDate = y + '-' + mm + '-' + dd;
-  document.getElementById('f-date').value = selectedDate;
-  document.getElementById('date-display-text').textContent = y + '年' + m + '月' + d + '日';
+function setSelectedDate(y,m,d) {
+  var mm=String(m).padStart(2,'0'), dd=String(d).padStart(2,'0');
+  selectedDate=y+'-'+mm+'-'+dd;
+  document.getElementById('f-date').value=selectedDate;
+  document.getElementById('date-display-text').textContent=y+'年'+m+'月'+d+'日';
   renderCalGrid();
 }
 function toggleCal() {
-  var popup = document.getElementById('cal-popup'), display = document.getElementById('date-display');
-  if (popup.classList.contains('open')) { closeCal(); }
-  else { popup.classList.add('open'); display.classList.add('open'); renderCalGrid(); }
+  var p=document.getElementById('cal-popup'), dp=document.getElementById('date-display');
+  if(p.classList.contains('open')){closeCal();}else{p.classList.add('open');dp.classList.add('open');renderCalGrid();}
 }
-function closeCal() {
-  document.getElementById('cal-popup').classList.remove('open');
-  document.getElementById('date-display').classList.remove('open');
-}
-function calMove(dir) {
-  calMonth += dir;
-  if (calMonth > 11) { calMonth = 0; calYear++; }
-  if (calMonth < 0)  { calMonth = 11; calYear--; }
-  renderCalGrid();
-}
-function renderCalGrid() { buildCalGrid(calYear, calMonth, selectedDate, 'cal-header-label', 'cal-grid', 'pickDate'); }
-function pickDate(y, m, d) { calYear = y; calMonth = m-1; setSelectedDate(y,m,d); closeCal(); }
+function closeCal(){ document.getElementById('cal-popup').classList.remove('open'); document.getElementById('date-display').classList.remove('open'); }
+function calMove(dir){ calMonth+=dir; if(calMonth>11){calMonth=0;calYear++;} if(calMonth<0){calMonth=11;calYear--;} renderCalGrid(); }
+function renderCalGrid(){ buildCalGrid(calYear,calMonth,selectedDate,'cal-header-label','cal-grid','pickDate'); }
+function pickDate(y,m,d){ calYear=y;calMonth=m-1;setSelectedDate(y,m,d);closeCal(); }
 
+/* コピー用カレンダー */
 function initCopyCal() {
-  var today = new Date(); var dow = today.getDay();
-  var next = new Date(today);
-  next.setDate(today.getDate() + (dow <= 4 ? 4 - dow : 11 - dow));
-  copyCalYear = next.getFullYear(); copyCalMonth = next.getMonth();
-  setCopySelectedDate(next.getFullYear(), next.getMonth()+1, next.getDate());
+  var today=new Date(), dow=today.getDay(), next=new Date(today);
+  next.setDate(today.getDate()+(dow<=4?4-dow:11-dow));
+  copyCalYear=next.getFullYear(); copyCalMonth=next.getMonth();
+  setCopySelectedDate(next.getFullYear(),next.getMonth()+1,next.getDate());
 }
-function setCopySelectedDate(y, m, d) {
-  var mm = String(m).padStart(2,'0'), dd = String(d).padStart(2,'0');
-  copySelectedDate = y + '-' + mm + '-' + dd;
-  document.getElementById('copy-date-text').textContent = y + '年' + m + '月' + d + '日';
+function setCopySelectedDate(y,m,d) {
+  var mm=String(m).padStart(2,'0'), dd=String(d).padStart(2,'0');
+  copySelectedDate=y+'-'+mm+'-'+dd;
+  document.getElementById('copy-date-text').textContent=y+'年'+m+'月'+d+'日';
   renderCopyCalGrid();
 }
 function toggleCopyCal() {
-  var popup = document.getElementById('copy-cal-popup'), display = document.getElementById('copy-date-display');
-  if (popup.classList.contains('open')) { closeCopyCal(); }
-  else { popup.classList.add('open'); display.classList.add('open'); renderCopyCalGrid(); }
+  var p=document.getElementById('copy-cal-popup'), dp=document.getElementById('copy-date-display');
+  if(p.classList.contains('open')){closeCopyCal();}else{p.classList.add('open');dp.classList.add('open');renderCopyCalGrid();}
 }
-function closeCopyCal() {
-  document.getElementById('copy-cal-popup').classList.remove('open');
-  document.getElementById('copy-date-display').classList.remove('open');
-}
-function copyCalMove(dir) {
-  copyCalMonth += dir;
-  if (copyCalMonth > 11) { copyCalMonth = 0; copyCalYear++; }
-  if (copyCalMonth < 0)  { copyCalMonth = 11; copyCalYear--; }
-  renderCopyCalGrid();
-}
-function renderCopyCalGrid() { buildCalGrid(copyCalYear, copyCalMonth, copySelectedDate, 'copy-cal-label', 'copy-cal-grid', 'pickCopyDate'); }
-function pickCopyDate(y, m, d) { copyCalYear = y; copyCalMonth = m-1; setCopySelectedDate(y,m,d); closeCopyCal(); }
+function closeCopyCal(){ document.getElementById('copy-cal-popup').classList.remove('open'); document.getElementById('copy-date-display').classList.remove('open'); }
+function copyCalMove(dir){ copyCalMonth+=dir; if(copyCalMonth>11){copyCalMonth=0;copyCalYear++;} if(copyCalMonth<0){copyCalMonth=11;copyCalYear--;} renderCopyCalGrid(); }
+function renderCopyCalGrid(){ buildCalGrid(copyCalYear,copyCalMonth,copySelectedDate,'copy-cal-label','copy-cal-grid','pickCopyDate'); }
+function pickCopyDate(y,m,d){ copyCalYear=y;copyCalMonth=m-1;setCopySelectedDate(y,m,d);closeCopyCal(); }
 
-function buildCalGrid(year, month, selected, labelId, gridId, pickFn) {
-  var DAYS = ['日','月','火','水','木','金','土'];
-  var today = new Date(); today.setHours(0,0,0,0);
-  document.getElementById(labelId).textContent = year + '年 ' + (month+1) + '月';
-  var html = '';
-  var dc = ['sun','','','','','','sat'];
-  for (var i = 0; i < 7; i++) html += '<div class="cal-dow ' + dc[i] + '">' + DAYS[i] + '</div>';
-  var firstDay = new Date(year, month, 1).getDay();
-  var lastDate = new Date(year, month+1, 0).getDate();
-  var prevLast = new Date(year, month, 0).getDate();
-  for (var i = 0; i < firstDay; i++) html += '<div class="cal-day other-month">' + (prevLast - firstDay + 1 + i) + '</div>';
-  for (var d = 1; d <= lastDate; d++) {
-    var dt = new Date(year, month, d); var dow = dt.getDay();
-    var mm = String(month+1).padStart(2,'0'), dd = String(d).padStart(2,'0');
-    var ds = year + '-' + mm + '-' + dd;
-    var cls = 'cal-day';
-    if (dow===0) cls+=' sunday'; if (dow===6) cls+=' saturday';
-    if (dow===4) cls+=' thursday';
-    if (dt.getTime()===today.getTime()) cls+=' today';
-    if (ds===selected) cls+=' selected';
-    html += '<div class="' + cls + '" onclick="' + pickFn + '(' + year + ',' + (month+1) + ',' + d + ')">' + d + '</div>';
-  }
-  var total = firstDay + lastDate;
-  var rem = total % 7 === 0 ? 0 : 7 - (total % 7);
-  for (var i = 1; i <= rem; i++) html += '<div class="cal-day other-month">' + i + '</div>';
-  document.getElementById(gridId).innerHTML = html;
-}
-
-/* ── APP ── */
+/* APP */
 function showPage(p) {
-  document.getElementById('setup-screen').style.display = 'none';
-  document.getElementById('app-main').style.display = 'none';
+  document.getElementById('setup-screen').style.display='none';
+  document.getElementById('app-main').style.display='none';
   ['btn-list','btn-new','btn-setup'].forEach(function(id){ document.getElementById(id).classList.remove('active'); });
-  if (p === 'setup') {
-    document.getElementById('setup-screen').style.display = 'block';
-    document.getElementById('btn-setup').classList.add('active');
-  } else {
-    document.getElementById('app-main').style.display = 'block';
-    document.getElementById('page-list').style.display = (p==='list') ? 'block' : 'none';
-    document.getElementById('page-new').style.display  = (p==='new')  ? 'block' : 'none';
-    if (p==='list') { document.getElementById('btn-list').classList.add('active'); loadMeetings(); loadNotices(); }
-    if (p==='new')  { document.getElementById('btn-new').classList.add('active'); }
+  if(p==='setup'){ document.getElementById('setup-screen').style.display='block'; document.getElementById('btn-setup').classList.add('active'); }
+  else {
+    document.getElementById('app-main').style.display='block';
+    document.getElementById('page-list').style.display=(p==='list')?'block':'none';
+    document.getElementById('page-new').style.display=(p==='new')?'block':'none';
+    if(p==='list'){ document.getElementById('btn-list').classList.add('active'); loadMeetings(); loadNotices(); }
+    if(p==='new') document.getElementById('btn-new').classList.add('active');
   }
 }
-
 function startNew() {
-  editingId = null;
-  document.getElementById('form-page-title').textContent = '新規ミーティング入力';
-  document.getElementById('btn-delete').style.display = 'none';
-  document.getElementById('f-office').disabled = false;
+  editingId=null;
+  document.getElementById('form-page-title').textContent='新規ミーティング入力';
+  document.getElementById('btn-delete').style.display='none';
+  document.getElementById('f-office').disabled=false;
   initCal(); renderMemberFields(); showPage('new');
 }
-
 function saveConfig() {
-  var url = document.getElementById('sb-url').value.trim();
-  var key = document.getElementById('sb-key').value.trim();
-  if (!url || !key) { showAlert('setup-alert','error','URLとAnon Keyを両方入力してください。'); return; }
-  sbClient = window.supabase.createClient(url, key);
-  sbClient.from('meetings').select('id').limit(1).then(function(res) {
-    if (res.error) throw res.error;
-    localStorage.setItem('sb_url', url); localStorage.setItem('sb_key', key);
+  var url=document.getElementById('sb-url').value.trim(), key=document.getElementById('sb-key').value.trim();
+  if(!url||!key){ showAlert('setup-alert','error','URLとAnon Keyを両方入力してください。'); return; }
+  sbClient=window.supabase.createClient(url,key);
+  sbClient.from('meetings').select('id').limit(1).then(function(res){
+    if(res.error) throw res.error;
+    localStorage.setItem('sb_url',url); localStorage.setItem('sb_key',key);
     showAlert('setup-alert','success','✅ 接続成功！設定を保存しました。');
-    setTimeout(function(){ showPage('list'); }, 1200);
+    setTimeout(function(){ showPage('list'); },1200);
   }).catch(function(e){ showAlert('setup-alert','error','接続エラー: '+(e.message||e)); });
 }
-
-function setOffice(office, el) {
-  currentOffice = office;
+function setOffice(office,el) {
+  currentOffice=office;
   document.querySelectorAll('.office-tab').forEach(function(b){ b.classList.remove('active'); });
   el.classList.add('active'); loadMeetings();
 }
-
 function loadMeetings() {
-  if (!sbClient) { showPage('setup'); return; }
-  var listEl = document.getElementById('meeting-list');
-  listEl.innerHTML = '<div class="empty"><span class="spinner"></span> 読み込み中...</div>';
-  sbClient.from('meetings').select('*, meeting_members(*)').eq('office', currentOffice).order('meeting_date', { ascending: false }).then(function(res) {
-    if (res.error) throw res.error;
-    var meetings = res.data;
-    if (!meetings || meetings.length === 0) {
-      listEl.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">まだ記録がありません</div><p style="font-size:13px;">「新規入力」からミーティング内容を登録しましょう</p></div>';
-      return;
-    }
-    listEl.innerHTML = meetings.map(function(m){ return renderCard(m); }).join('');
+  if(!sbClient){ showPage('setup'); return; }
+  var listEl=document.getElementById('meeting-list');
+  listEl.innerHTML='<div class="empty"><span class="spinner"></span> 読み込み中...</div>';
+  sbClient.from('meetings').select('*, meeting_members(*)').eq('office',currentOffice).order('meeting_date',{ascending:false}).then(function(res){
+    if(res.error) throw res.error;
+    var meetings=res.data;
+    if(!meetings||meetings.length===0){ listEl.innerHTML='<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">まだ記録がありません</div><p style="font-size:13px;">「新規入力」からミーティング内容を登録しましょう</p></div>'; return; }
+    listEl.innerHTML=meetings.map(function(m){ return renderCard(m); }).join('');
   }).catch(function(e){ showAlert('list-alert','error','データ取得エラー: '+(e.message||e)); listEl.innerHTML=''; });
 }
-
 function renderCard(m) {
-  var d = new Date(m.meeting_date + 'T00:00:00');
-  var ds = d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日（木）';
-  var ol = m.office==='akita'?'秋田事業所':'横手事業所';
-  var bc = m.office==='akita'?'badge-akita':'badge-yokote';
-  var sc = 'office-stripe-'+m.office;
-  var mems = m.meeting_members||[];
-  var order = MEMBERS[m.office]||[];
+  var d=new Date(m.meeting_date+'T00:00:00');
+  var ds=d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日（木）';
+  var ol=m.office==='akita'?'秋田事業所':'横手事業所';
+  var bc=m.office==='akita'?'badge-akita':'badge-yokote';
+  var sc='office-stripe-'+m.office;
+  var mems=m.meeting_members||[], order=MEMBERS[m.office]||[];
   mems.sort(function(a,b){ return order.indexOf(a.member_name)-order.indexOf(b.member_name); });
-  var rows = mems.map(function(mem) {
+  var rows=mems.map(function(mem){
     var p=mem.progress||0, pc=p>=80?'prog-high':p>=40?'prog-mid':'prog-low';
     return '<tr><td><strong>'+esc(mem.member_name)+'</strong></td><td>'+esc(mem.current_work||'—')+'</td><td><div class="prog-val">'+p+'%</div><div class="progress-bar"><div class="progress-fill '+pc+'" style="width:'+p+'%"></div></div></td><td>'+esc(mem.next_plan||'—')+'</td></tr>';
   }).join('');
-  var note = m.note?'<div class="meeting-note"><strong>📌 メモ：</strong> '+esc(m.note)+'</div>':'';
-  return '<div class="meeting-card '+sc+'">'
-    +'<div class="meeting-card-header" onclick="toggleCard(\'card-'+m.id+'\')">'
+  var note=m.note?'<div class="meeting-note"><strong>📌 メモ：</strong> '+esc(m.note)+'</div>':'';
+  return '<div class="meeting-card '+sc+'"><div class="meeting-card-header" onclick="toggleCard(\'card-'+m.id+'\')">'
     +'<div><div class="meeting-date">'+ds+'</div></div>'
     +'<span class="meeting-badge '+bc+'">'+ol+'</span>'
     +'<div class="card-actions">'
@@ -698,69 +572,53 @@ function renderCard(m) {
     +'<div class="member-table-wrap"><table class="member-table"><thead><tr><th>氏名</th><th>今週の作業状況</th><th>進捗率</th><th>来週の作業予定</th></tr></thead><tbody>'+rows+'</tbody></table></div>'
     +note+'</div></div>';
 }
-
-function toggleCard(id) {
-  document.getElementById(id).classList.toggle('open');
-  document.getElementById('icon-'+id).classList.toggle('open');
-}
-
+function toggleCard(id){ document.getElementById(id).classList.toggle('open'); document.getElementById('icon-'+id).classList.toggle('open'); }
 function openCopyModal(id) {
-  if (!sbClient) return;
-  sbClient.from('meetings').select('*, meeting_members(*)').eq('id',id).single().then(function(res) {
-    if (res.error) throw res.error;
-    copySourceData = res.data; initCopyCal();
+  sbClient.from('meetings').select('*, meeting_members(*)').eq('id',id).single().then(function(res){
+    if(res.error) throw res.error;
+    copySourceData=res.data; initCopyCal();
     document.getElementById('copy-modal').classList.add('open');
   }).catch(function(e){ showAlert('list-alert','error','エラー: '+(e.message||e)); });
 }
-function closeModal() {
-  document.getElementById('copy-modal').classList.remove('open');
-  copySourceData = null; copySelectedDate = '';
-}
+function closeModal(){ document.getElementById('copy-modal').classList.remove('open'); copySourceData=null; copySelectedDate=''; }
 function executeCopy() {
-  if (!copySourceData || !copySelectedDate) { alert('日付を選択してください。'); return; }
-  var m = copySourceData;
-  sbClient.from('meetings').insert({office:m.office,meeting_date:copySelectedDate,note:m.note}).select().single().then(function(r1) {
-    if (r1.error) throw r1.error;
-    var rows = (m.meeting_members||[]).map(function(mem){ return {meeting_id:r1.data.id,member_name:mem.member_name,current_work:mem.current_work,progress:mem.progress,next_plan:mem.next_plan}; });
-    return sbClient.from('meeting_members').insert(rows);
-  }).then(function(r2) {
-    if (r2.error) throw r2.error;
+  if(!copySourceData||!copySelectedDate){ alert('日付を選択してください。'); return; }
+  var m=copySourceData;
+  sbClient.from('meetings').insert({office:m.office,meeting_date:copySelectedDate,note:m.note}).select().single().then(function(r1){
+    if(r1.error) throw r1.error;
+    return sbClient.from('meeting_members').insert((m.meeting_members||[]).map(function(mem){ return {meeting_id:r1.data.id,member_name:mem.member_name,current_work:mem.current_work,progress:mem.progress,next_plan:mem.next_plan}; }));
+  }).then(function(r2){
+    if(r2.error) throw r2.error;
     closeModal(); showAlert('list-alert','success','✅ コピーして作成しました！'); loadMeetings();
   }).catch(function(e){ showAlert('list-alert','error','コピーエラー: '+(e.message||e)); });
 }
-
 function startEdit(id) {
-  if (!sbClient) return;
-  sbClient.from('meetings').select('*, meeting_members(*)').eq('id',id).single().then(function(res) {
-    if (res.error) throw res.error;
-    var m = res.data; editingId = id;
-    document.getElementById('form-page-title').textContent = '✏️ ミーティング編集';
-    document.getElementById('btn-delete').style.display = 'inline-block';
-    document.getElementById('f-office').value = m.office;
-    document.getElementById('f-office').disabled = true;
-    var parts = m.meeting_date.split('-');
-    calYear = parseInt(parts[0]); calMonth = parseInt(parts[1])-1;
+  sbClient.from('meetings').select('*, meeting_members(*)').eq('id',id).single().then(function(res){
+    if(res.error) throw res.error;
+    var m=res.data; editingId=id;
+    document.getElementById('form-page-title').textContent='✏️ ミーティング編集';
+    document.getElementById('btn-delete').style.display='inline-block';
+    document.getElementById('f-office').value=m.office;
+    document.getElementById('f-office').disabled=true;
+    var parts=m.meeting_date.split('-');
+    calYear=parseInt(parts[0]); calMonth=parseInt(parts[1])-1;
     setSelectedDate(parseInt(parts[0]),parseInt(parts[1]),parseInt(parts[2]));
-    document.getElementById('f-note').value = m.note||'';
+    document.getElementById('f-note').value=m.note||'';
     renderMemberFields();
-    (m.meeting_members||[]).forEach(function(mem) {
+    (m.meeting_members||[]).forEach(function(mem){
       var wEl=document.getElementById('work-'+mem.member_name);
       var pEl=document.getElementById('prog-'+mem.member_name);
       var nEl=document.getElementById('next-'+mem.member_name);
-      if(wEl) wEl.value=mem.current_work||'';
-      if(pEl) pEl.value=mem.progress||0;
-      if(nEl) nEl.value=mem.next_plan||'';
+      if(wEl) wEl.value=mem.current_work||''; if(pEl) pEl.value=mem.progress||0; if(nEl) nEl.value=mem.next_plan||'';
     });
     showPage('new');
   }).catch(function(e){ showAlert('list-alert','error','編集データ取得エラー: '+(e.message||e)); });
 }
-
 function renderMemberFields() {
-  var office = document.getElementById('f-office').value;
-  var mems = MEMBERS[office];
-  var label = office==='akita'?'秋田事業所':'横手事業所';
-  document.getElementById('members-section-label').textContent = '👥 '+label+' メンバー別作業状況';
-  document.getElementById('member-fields').innerHTML = mems.map(function(name) {
+  var office=document.getElementById('f-office').value, mems=MEMBERS[office];
+  var label=office==='akita'?'秋田事業所':'横手事業所';
+  document.getElementById('members-section-label').textContent='👥 '+label+' メンバー別作業状況';
+  document.getElementById('member-fields').innerHTML=mems.map(function(name){
     return '<div class="member-row"><div class="member-name-label">'+name+'</div>'
       +'<div class="field-sm"><label>今週の作業状況</label><textarea id="work-'+name+'" placeholder="作業内容..." rows="2"></textarea></div>'
       +'<div class="field-sm"><label>進捗率 (%)</label><input type="number" id="prog-'+name+'" min="0" max="100" value="0"></div>'
@@ -768,55 +626,48 @@ function renderMemberFields() {
       +'</div>';
   }).join('');
 }
-
 function saveMeeting() {
-  if (!sbClient) { showPage('setup'); return; }
-  var office=document.getElementById('f-office').value;
-  var date=document.getElementById('f-date').value;
-  var note=document.getElementById('f-note').value.trim();
-  if (!date) { showAlert('new-alert','error','日付を選択してください。'); return; }
-  var members = MEMBERS[office].map(function(name) {
-    return { member_name:name, current_work:(document.getElementById('work-'+name).value||'').trim(), progress:parseInt(document.getElementById('prog-'+name).value||'0'), next_plan:(document.getElementById('next-'+name).value||'').trim() };
+  if(!sbClient){ showPage('setup'); return; }
+  var office=document.getElementById('f-office').value, date=document.getElementById('f-date').value, note=document.getElementById('f-note').value.trim();
+  if(!date){ showAlert('new-alert','error','日付を選択してください。'); return; }
+  var members=MEMBERS[office].map(function(name){
+    return {member_name:name,current_work:(document.getElementById('work-'+name).value||'').trim(),progress:parseInt(document.getElementById('prog-'+name).value||'0'),next_plan:(document.getElementById('next-'+name).value||'').trim()};
   });
-  if (editingId) {
-    sbClient.from('meetings').update({meeting_date:date,note:note}).eq('id',editingId).then(function(r1) {
+  if(editingId){
+    sbClient.from('meetings').update({meeting_date:date,note:note}).eq('id',editingId).then(function(r1){
       if(r1.error) throw r1.error;
       return sbClient.from('meeting_members').delete().eq('meeting_id',editingId);
-    }).then(function(r2) {
+    }).then(function(r2){
       if(r2.error) throw r2.error;
       return sbClient.from('meeting_members').insert(members.map(function(m){ return Object.assign({},m,{meeting_id:editingId}); }));
-    }).then(function(r3) {
+    }).then(function(r3){
       if(r3.error) throw r3.error;
-      showAlert('new-alert','success','✅ 更新しました！');
-      editingId=null; setTimeout(function(){ showPage('list'); },1000);
+      showAlert('new-alert','success','✅ 更新しました！'); editingId=null;
+      setTimeout(function(){ showPage('list'); },1000);
     }).catch(function(e){ showAlert('new-alert','error','更新エラー: '+(e.message||e)); });
   } else {
-    sbClient.from('meetings').insert({office:office,meeting_date:date,note:note}).select().single().then(function(r1) {
+    sbClient.from('meetings').insert({office:office,meeting_date:date,note:note}).select().single().then(function(r1){
       if(r1.error) throw r1.error;
       return sbClient.from('meeting_members').insert(members.map(function(m){ return Object.assign({},m,{meeting_id:r1.data.id}); }));
-    }).then(function(r2) {
+    }).then(function(r2){
       if(r2.error) throw r2.error;
       showAlert('new-alert','success','✅ 保存しました！');
       setTimeout(function(){ document.getElementById('f-note').value=''; renderMemberFields(); initCal(); editingId=null; showPage('list'); },1000);
     }).catch(function(e){ showAlert('new-alert','error','保存エラー: '+(e.message||e)); });
   }
 }
-
 function deleteMeeting() {
-  if (!editingId) return;
-  if (!confirm('このミーティング記録を削除しますか？\nこの操作は元に戻せません。')) return;
-  sbClient.from('meetings').delete().eq('id',editingId).then(function(res) {
-    if(res.error) throw res.error;
-    editingId=null; showPage('list');
+  if(!editingId) return;
+  if(!confirm('このミーティング記録を削除しますか？\nこの操作は元に戻せません。')) return;
+  sbClient.from('meetings').delete().eq('id',editingId).then(function(res){
+    if(res.error) throw res.error; editingId=null; showPage('list');
   }).catch(function(e){ showAlert('new-alert','error','削除エラー: '+(e.message||e)); });
 }
-
 function showAlert(id,type,msg) {
   var el=document.getElementById(id); if(!el) return;
   el.innerHTML='<div class="alert alert-'+type+'">'+msg+'</div>';
   if(type==='success') setTimeout(function(){ el.innerHTML=''; },3000);
 }
-
 function esc(str) {
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
 }
