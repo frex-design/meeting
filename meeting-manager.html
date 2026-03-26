@@ -205,51 +205,9 @@
   <nav class="header-nav">
     <button class="nav-btn" id="btn-new" onclick="startNew()">✏️ 新規入力</button>
     <button class="nav-btn active" id="btn-list" onclick="showPage('list')">📋 ミーティング一覧</button>
-    <button class="nav-btn nav-btn-sm" id="btn-setup" onclick="showPage('setup')">⚙</button>
     <button class="admin-btn" id="btn-admin" onclick="toggleAdminMode()" title="管理者モード">🔐</button>
   </nav>
 </header>
-
-<!-- SETUP -->
-<div id="setup-screen" style="display:none;">
-  <h2>⚙️ Supabase 接続設定</h2>
-  <p>Supabase プロジェクトの URL と anon key を入力してください。<br>設定はブラウザに保存され、次回から自動で接続されます。</p>
-  <div id="setup-alert"></div>
-  <div class="field"><label>SUPABASE URL</label><input type="text" id="sb-url" placeholder="https://xxxxxxxxxx.supabase.co"></div>
-  <div class="field"><label>SUPABASE ANON KEY</label><input type="text" id="sb-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."></div>
-  <button class="btn-primary" onclick="saveConfig()">接続して保存</button>
-  <div style="margin-top:36px;">
-    <div class="section-label">📄 Supabase SQL セットアップ（初回のみ実行）</div>
-    <p style="color:var(--text-muted);font-size:12px;margin-bottom:8px;">Supabase の SQL Editor で以下を実行してください：</p>
-    <div class="code-block">-- ミーティングテーブル
-CREATE TABLE meetings (
-  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  office text NOT NULL CHECK (office IN ('akita', 'yokote')),
-  meeting_date date NOT NULL,
-  note text,
-  created_at timestamptz DEFAULT now()
-);
-CREATE TABLE meeting_members (
-  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  meeting_id uuid REFERENCES meetings(id) ON DELETE CASCADE,
-  member_name text NOT NULL,
-  current_work text,
-  progress int CHECK (progress BETWEEN 0 AND 100),
-  next_plan text
-);
-CREATE TABLE notices (
-  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  content text NOT NULL,
-  created_at timestamptz DEFAULT now()
-);
-ALTER TABLE meetings ENABLE ROW LEVEL SECURITY;
-ALTER TABLE meeting_members ENABLE ROW LEVEL SECURITY;
-ALTER TABLE notices ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "allow_all_meetings" ON meetings FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "allow_all_members" ON meeting_members FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "allow_all_notices" ON notices FOR ALL USING (true) WITH CHECK (true);</div>
-  </div>
-</div>
 
 <!-- 管理者パスワードモーダル -->
 <div class="modal-overlay" id="admin-modal">
@@ -373,19 +331,16 @@ var MEMBERS = {
   yokote: ['加瀬谷 建', '星野 健太', '佐藤 優太', '沓澤 幸']
 };
 var ADMIN_PW = '1111';
+var SB_URL = 'https://rrsbyiypwgnwzqadwpky.supabase.co';
+var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJyc2J5aXlwd2dud3pxYWR3cGt5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5OTI4NjMsImV4cCI6MjA4OTU2ODg2M30.ZNc4AebnJkBzQFvcxW_Pv2TSEBncyeuapCHE5IAeJQg';
 var sbClient = null, currentOffice = 'akita', editingId = null;
 var isAdmin = false, adminCallback = null;
 var calYear=0,calMonth=0,selectedDate='';
 var copyCalYear=0,copyCalMonth=0,copySelectedDate='',copySourceData=null;
 
 window.addEventListener('DOMContentLoaded', function() {
-  var url=localStorage.getItem('sb_url'), key=localStorage.getItem('sb_key');
-  if(url&&key){
-    sbClient=window.supabase.createClient(url,key);
-    document.getElementById('sb-url').value=url;
-    document.getElementById('sb-key').value=key;
-    showPage('list');
-  } else { showPage('setup'); }
+  sbClient = window.supabase.createClient(SB_URL, SB_KEY);
+  showPage('list');
   initCal(); renderMemberFields();
   document.addEventListener('click', function(e){
     var w1=document.getElementById('date-picker-wrap');
@@ -569,33 +524,17 @@ function pickCopyDate(y,m,d){copyCalYear=y;copyCalMonth=m-1;setCopySelectedDate(
 
 /* APP */
 function showPage(p){
-  document.getElementById('setup-screen').style.display='none';
   document.getElementById('app-main').style.display='none';
-  ['btn-list','btn-new','btn-setup'].forEach(function(id){document.getElementById(id).classList.remove('active');});
-  if(p==='setup'){document.getElementById('setup-screen').style.display='block';document.getElementById('btn-setup').classList.add('active');}
-  else{
-    document.getElementById('app-main').style.display='block';
-    document.getElementById('page-list').style.display=(p==='list')?'block':'none';
-    document.getElementById('page-new').style.display=(p==='new')?'block':'none';
-    if(p==='list'){document.getElementById('btn-list').classList.add('active');loadMeetings();loadNotices();}
-    if(p==='new') document.getElementById('btn-new').classList.add('active');
-  }
+  ['btn-list','btn-new'].forEach(function(id){document.getElementById(id).classList.remove('active');});
+  document.getElementById('app-main').style.display='block';
+  document.getElementById('page-list').style.display=(p==='list')?'block':'none';
+  document.getElementById('page-new').style.display=(p==='new')?'block':'none';
+  if(p==='list'){document.getElementById('btn-list').classList.add('active');loadMeetings();loadNotices();}
+  if(p==='new') document.getElementById('btn-new').classList.add('active');
 }
 function startNew(){editingId=null;document.getElementById('form-page-title').textContent='新規ミーティング入力';document.getElementById('btn-delete').style.display='none';document.getElementById('f-office').disabled=false;initCal();renderMemberFields();showPage('new');}
-function saveConfig(){
-  var url=document.getElementById('sb-url').value.trim(),key=document.getElementById('sb-key').value.trim();
-  if(!url||!key){showAlert('setup-alert','error','URLとAnon Keyを両方入力してください。');return;}
-  sbClient=window.supabase.createClient(url,key);
-  sbClient.from('meetings').select('id').limit(1).then(function(res){
-    if(res.error) throw res.error;
-    localStorage.setItem('sb_url',url);localStorage.setItem('sb_key',key);
-    showAlert('setup-alert','success','✅ 接続成功！設定を保存しました。');
-    setTimeout(function(){showPage('list');},1200);
-  }).catch(function(e){showAlert('setup-alert','error','接続エラー: '+(e.message||e));});
-}
 function setOffice(office,el){currentOffice=office;document.querySelectorAll('.office-tab').forEach(function(b){b.classList.remove('active');});el.classList.add('active');loadMeetings();}
 function loadMeetings(){
-  if(!sbClient){showPage('setup');return;}
   var listEl=document.getElementById('meeting-list');
   listEl.innerHTML='<div class="empty"><span class="spinner"></span> 読み込み中...</div>';
   sbClient.from('meetings').select('*, meeting_members(*)').eq('office',currentOffice).order('meeting_date',{ascending:false}).then(function(res){
