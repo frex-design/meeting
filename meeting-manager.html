@@ -721,13 +721,9 @@ function renderLeadersMTG(records){
         var memoContent=memo&&memo.content?memo.content:'';
         var cls=item.checked?'checklist-label checked':'checklist-label';
         var chkAttr=isAdmin?' onchange="toggleCheck(\''+item.id+'\',this)"':' disabled';
-        var memoId=memo?memo.id:null;
         var memoDisp='<div class="memo-area">';
         if(isAdmin){
-          memoDisp+='<textarea class="memo-box" id="memo-ta-'+item.id+'" rows="4" placeholder="メモを入力...">'+memoContent+'</textarea>'
-            +'<div style="display:flex;justify-content:flex-end;margin-top:6px;">'
-            +'<button class="btn-save" style="font-size:12px;padding:6px 16px;" onclick="saveMemo(\''+item.id+'\','+(memoId?'\''+memoId+'\'':'null')+')">💾 保存</button>'
-            +'</div>';
+          memoDisp+='<textarea class="memo-box" id="memo-ta-'+item.id+'" data-memo-id="'+(memo?memo.id:'')+'" rows="4" placeholder="メモを入力...">'+memoContent+'</textarea>';
         } else {
           memoDisp+='<div class="memo-box '+(memoContent?'':'empty-memo')+'">'+(memoContent?esc(memoContent):'メモなし')+'</div>';
         }
@@ -740,6 +736,13 @@ function renderLeadersMTG(records){
           +memoDisp
           +'</div>';
       }).join('');
+
+      // 管理者の場合、カード下部に全メモ保存ボタンを1つ
+      var saveMemoBtn = isAdmin
+        ? '<div style="padding:0 0 16px;display:flex;justify-content:flex-end;">'
+          +'<button class="btn-save" style="font-size:13px;" onclick="saveAllMemos(\''+r.id+'\')">💾 メモを保存する</button>'
+          +'</div>'
+        : '';
       var editBtns=isAdmin
         ?'<button class="btn-edit" onclick="showEditLeadersForm(\''+r.id+'\')">✏️ 編集</button>'
          +'<button class="btn-edit" style="border-color:var(--danger);color:var(--danger);" onclick="deleteLeadersMTG(\''+r.id+'\')">🗑 削除</button>'
@@ -753,6 +756,7 @@ function renderLeadersMTG(records){
         +'<div class="leaders-card-body" id="leaders-body-'+r.id+'">'
         +'<div class="leaders-section-title">✅ 確認事項 / メモ</div>'
         +(checkHtml||'<p style="font-size:13px;color:var(--text-muted);">確認事項なし</p>')
+        +saveMemoBtn
         +'</div></div></div>';
     });
   }
@@ -800,20 +804,68 @@ function showEditLeadersForm(mtgId){
   });
 }
 function saveEditLeaders(mtgId){
-  var items=[];
-  document.querySelectorAll('#ef-items-'+mtgId+' .checklist-edit-item').forEach(function(el,i){
-    var inp=el.querySelector('input[type=text]');
-    if(inp&&inp.value.trim()) items.push({label:inp.value.trim(),sort_order:i});
-  });
-  sbClient.from('leaders_checklist').delete().eq('mtg_id',mtgId).then(function(r1){
-    if(r1.error)throw r1.error;
-    if(items.length===0){loadLeadersMTG();return;}
-    return sbClient.from('leaders_checklist').insert(items.map(function(item){return Object.assign({},item,{mtg_id:mtgId,checked:false});}));
-  }).then(function(r2){
-    if(r2&&r2.error)throw r2.error;
+  // 既存チェックリストとメモを取得してから更新
+  sbClient.from('leaders_checklist').select('id,label').eq('mtg_id',mtgId).then(function(er){
+    var existItems=er.data||[];
+    var existIds=existItems.map(function(x){return x.id;});
+    if(existIds.length===0) return Promise.resolve({existItems:[],memos:[]});
+    return sbClient.from('leaders_memo').select('*').in('checklist_id',existIds).then(function(mr){
+      return {existItems:existItems,memos:mr.data||[]};
+    });
+  }).then(function(prev){
+    var items=[];
+    document.querySelectorAll('#ef-items-'+mtgId+' .checklist-edit-item').forEach(function(el,i){
+      var inp=el.querySelector('input[type=text]');
+      if(inp&&inp.value.trim()) items.push({label:inp.value.trim(),sort_order:i});
+    });
+    return sbClient.from('leaders_checklist').delete().eq('mtg_id',mtgId).then(function(r1){
+      if(r1.error)throw r1.error;
+      if(items.length===0){loadLeadersMTG();return;}
+      return sbClient.from('leaders_checklist').insert(items.map(function(item){
+        return {mtg_id:mtgId,label:item.label,sort_order:item.sort_order,checked:false};
+      })).select().then(function(r2){
+        if(r2.error)throw r2.error;
+        // 同じlabelのメモを新IDに紐づけて復元
+        var inserts=[];
+        (r2.data||[]).forEach(function(newItem){
+          var old=prev.existItems.find(function(x){return x.label===newItem.label;});
+          if(old){
+            var memo=prev.memos.find(function(m){return m.checklist_id===old.id;});
+            if(memo&&memo.content) inserts.push({checklist_id:newItem.id,content:memo.content});
+          }
+        });
+        if(inserts.length===0) return;
+        return sbClient.from('leaders_memo').insert(inserts);
+      });
+    });
+  }).then(function(){
     showAlert('leaders-alert','success','✅ 確認事項を更新しました！');
     loadLeadersMTG();
   }).catch(function(e){alert('更新エラー: '+(e.message||e));});
+}
+function saveAllMemos(mtgId){
+  var body=document.getElementById('leaders-body-'+mtgId);
+  if(!body)return;
+  var textareas=body.querySelectorAll('textarea.memo-box');
+  var promises=[];
+  textareas.forEach(function(ta){
+    var itemId=ta.id.replace('memo-ta-','');
+    var memoId=ta.getAttribute('data-memo-id')||null;
+    var content=ta.value.trim();
+    if(memoId){
+      promises.push(sbClient.from('leaders_memo').update({content:content}).eq('id',memoId));
+    } else {
+      promises.push(
+        sbClient.from('leaders_memo').insert({checklist_id:itemId,content:content}).select().single().then(function(res){
+          if(res.data) ta.setAttribute('data-memo-id',res.data.id);
+          return res;
+        })
+      );
+    }
+  });
+  Promise.all(promises).then(function(){
+    showAlert('leaders-alert','success','✅ メモを保存しました！');
+  }).catch(function(e){alert('保存エラー: '+(e.message||e));});
 }
 function addCheckItem(containerId){
   var cont=document.getElementById(containerId);if(!cont)return;
@@ -861,21 +913,6 @@ function toggleCheck(itemId,checkbox){
     if(lbl){if(checkbox.checked)lbl.classList.add('checked');else lbl.classList.remove('checked');}
   });
 }
-function saveMemo(itemId,memoId){
-  var ta=document.getElementById('memo-ta-'+itemId);
-  var content=ta?ta.value.trim():'';
-  var promise;
-  if(memoId&&memoId!=='null'){
-    promise=sbClient.from('leaders_memo').update({content:content}).eq('id',memoId);
-  } else {
-    promise=sbClient.from('leaders_memo').insert({checklist_id:itemId,content:content});
-  }
-  promise.then(function(res){
-    if(res.error){alert('保存エラー: '+res.error.message);return;}
-    loadLeadersMTG();
-  });
-}
-
 function showAlert(id,type,msg){
   var el=document.getElementById(id);if(!el)return;
   el.innerHTML='<div class="alert alert-'+type+'">'+msg+'</div>';
