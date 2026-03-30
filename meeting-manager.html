@@ -17,6 +17,7 @@
     --danger: #b85450; --danger-light: rgba(184,84,80,.1);
     --success: #4a7a55; --success-light: rgba(74,122,85,.1);
     --notice: #7a5a9e; --notice-light: rgba(122,90,158,.1); --notice-border: rgba(122,90,158,.3);
+    --leaders: #a78bc0; --leaders-light: rgba(167,139,192,.12);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: 'Noto Sans JP', sans-serif; font-size: 14px; min-height: 100vh; }
@@ -35,23 +36,22 @@
   .admin-btn:hover { border-color: var(--notice); color: var(--notice); background: var(--notice-light); }
   .admin-btn.active { border-color: var(--notice); color: var(--notice); background: var(--notice-light); }
 
-  /* SETUP */
-  #setup-screen { max-width: 580px; margin: 60px auto; padding: 44px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 4px 24px rgba(139,111,78,.08); }
-  #setup-screen h2 { color: var(--accent); font-size: 18px; margin-bottom: 8px; font-weight: 700; }
-  #setup-screen p { color: var(--text-muted); font-size: 13px; margin-bottom: 28px; line-height: 1.8; }
+  /* 管理者モーダル */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(44,36,22,.45); z-index: 300; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px; box-shadow: 0 12px 48px rgba(44,36,22,.16); width: 90%; max-width: 360px; }
+  .modal-title { font-size: 16px; font-weight: 700; color: var(--accent); margin-bottom: 6px; }
+  .modal-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.7; }
+  .modal-btn-row { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+  .btn-modal-cancel { background: none; border: 1px solid var(--border); color: var(--text-muted); padding: 9px 20px; border-radius: 8px; cursor: pointer; font-family: 'Noto Sans JP', sans-serif; font-size: 13px; }
+  .btn-modal-cancel:hover { border-color: var(--text-muted); color: var(--text); }
+  .btn-modal-ok { background: var(--accent); color: #fff; border: none; padding: 9px 24px; border-radius: 8px; font-weight: 700; font-family: 'Noto Sans JP', sans-serif; cursor: pointer; font-size: 13px; }
+  .btn-modal-ok:hover { background: var(--accent2); }
+  .pw-error { color: var(--danger); font-size: 12px; margin-top: 6px; display: none; }
   .field { margin-bottom: 18px; }
-  .field label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; font-weight: 500; letter-spacing: .5px; }
-  .field input, .field textarea, .field select { width: 100%; background: var(--bg2); border: 1px solid var(--border); color: var(--text); padding: 10px 14px; border-radius: 8px; font-family: 'Noto Sans JP', sans-serif; font-size: 13px; outline: none; transition: border-color .2s, box-shadow .2s; }
-  .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
-  .btn-primary { background: var(--accent); color: #fff; border: none; padding: 12px 28px; border-radius: 8px; font-weight: 700; font-family: 'Noto Sans JP', sans-serif; cursor: pointer; font-size: 14px; transition: background .2s; width: 100%; }
-  .btn-primary:hover { background: var(--accent2); }
-
-  /* MAIN */
-  .main { max-width: 1280px; margin: 0 auto; padding: 32px 28px; }
-  .page-bar { display: flex; align-items: center; margin-bottom: 24px; }
-  .page-title { font-size: 20px; font-weight: 700; }
-
-
+  .field label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; font-weight: 500; }
+  .field input, .field textarea, .field select { width: 100%; background: var(--bg2); border: 1px solid var(--border); color: var(--text); padding: 10px 14px; border-radius: 8px; font-family: 'Noto Sans JP', sans-serif; font-size: 13px; outline: none; transition: border-color .2s; }
+  .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--accent); }
 
   /* お知らせ */
   .notice-area { margin-bottom: 20px; background: var(--notice-light); border: 1px solid var(--notice-border); border-radius: 12px; overflow: hidden; }
@@ -62,49 +62,34 @@
   .notice-ticker-inner:hover { animation-play-state: paused; }
   .notice-ticker-item { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text); padding: 0 48px 0 0; }
   .notice-ticker-item .sep { color: var(--notice); margin-right: 48px; }
-  @keyframes ticker-scroll {
-    0%   { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-  }
+  @keyframes ticker-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
   .notice-empty-ticker { flex: 1; display: flex; align-items: center; padding: 0 20px; font-size: 13px; color: var(--text-muted); }
-
-  /* 管理者用お知らせ管理パネル */
   .notice-admin-panel { border-top: 1px solid var(--notice-border); padding: 12px 16px; background: var(--surface); }
   .notice-list-item { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px dashed var(--notice-border); font-size: 13px; }
   .notice-list-item:last-of-type { border-bottom: none; }
   .notice-list-text { flex: 1; line-height: 1.6; color: var(--text); }
   .notice-list-date { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-  .notice-delete { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 14px; padding: 3px 6px; border-radius: 4px; transition: all .2s; flex-shrink: 0; }
+  .notice-delete { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 14px; padding: 3px 6px; border-radius: 4px; transition: all .2s; }
   .notice-delete:hover { color: var(--danger); background: var(--danger-light); }
-  .notice-edit-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 13px; padding: 3px 6px; border-radius: 4px; transition: all .2s; flex-shrink: 0; }
+  .notice-edit-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 13px; padding: 3px 6px; border-radius: 4px; transition: all .2s; }
   .notice-edit-btn:hover { color: var(--accent); background: var(--accent-light); }
   .notice-add-btn { display: flex; align-items: center; justify-content: center; gap: 8px; background: none; border: 1px dashed var(--notice-border); color: var(--notice); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-family: 'Noto Sans JP', sans-serif; font-size: 13px; transition: all .2s; width: 100%; margin-top: 10px; }
   .notice-add-btn:hover { background: var(--notice-light); border-style: solid; }
   .notice-input-wrap { margin-top: 10px; }
-  .notice-input-wrap textarea { width: 100%; background: var(--bg2); border: 1px solid var(--notice-border); color: var(--text); padding: 10px 12px; border-radius: 8px; font-family: 'Noto Sans JP', sans-serif; font-size: 13px; outline: none; resize: vertical; min-height: 70px; transition: border-color .2s; }
-  .notice-input-wrap textarea:focus { border-color: var(--notice); }
+  .notice-input-wrap textarea { width: 100%; background: var(--bg2); border: 1px solid var(--notice-border); color: var(--text); padding: 10px 12px; border-radius: 8px; font-family: 'Noto Sans JP', sans-serif; font-size: 13px; outline: none; resize: vertical; min-height: 70px; }
   .notice-input-btns { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
-  .btn-notice-cancel { background: none; border: 1px solid var(--border); color: var(--text-muted); padding: 7px 16px; border-radius: 6px; cursor: pointer; font-family: 'Noto Sans JP', sans-serif; font-size: 13px; transition: all .2s; }
-  .btn-notice-cancel:hover { color: var(--text); border-color: var(--text-muted); }
-  .btn-notice-post { background: var(--notice); color: #fff; border: none; padding: 7px 20px; border-radius: 6px; font-weight: 700; font-family: 'Noto Sans JP', sans-serif; cursor: pointer; font-size: 13px; transition: background .2s; }
-  .btn-notice-post:hover { background: #6a4a8e; }
-  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(44,36,22,.45); z-index: 300; align-items: center; justify-content: center; }
-  .modal-overlay.open { display: flex; }
-  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px; box-shadow: 0 12px 48px rgba(44,36,22,.16); width: 90%; max-width: 360px; }
-  .modal-title { font-size: 16px; font-weight: 700; color: var(--accent); margin-bottom: 6px; }
-  .modal-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.7; }
-  .modal-btn-row { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
-  .btn-modal-cancel { background: none; border: 1px solid var(--border); color: var(--text-muted); padding: 9px 20px; border-radius: 8px; cursor: pointer; font-family: 'Noto Sans JP', sans-serif; font-size: 13px; }
-  .btn-modal-cancel:hover { border-color: var(--text-muted); color: var(--text); }
-  .btn-modal-ok { background: var(--accent); color: #fff; border: none; padding: 9px 24px; border-radius: 8px; font-weight: 700; font-family: 'Noto Sans JP', sans-serif; cursor: pointer; font-size: 13px; transition: background .2s; }
-  .btn-modal-ok:hover { background: var(--accent2); }
-  .pw-error { color: var(--danger); font-size: 12px; margin-top: 6px; display: none; }
+  .btn-notice-cancel { background: none; border: 1px solid var(--border); color: var(--text-muted); padding: 7px 16px; border-radius: 6px; cursor: pointer; font-family: 'Noto Sans JP', sans-serif; font-size: 13px; }
+  .btn-notice-post { background: var(--notice); color: #fff; border: none; padding: 7px 20px; border-radius: 6px; font-weight: 700; font-family: 'Noto Sans JP', sans-serif; cursor: pointer; font-size: 13px; }
+
+  /* MAIN */
+  .main { max-width: 1280px; margin: 0 auto; padding: 32px 28px; }
 
   /* OFFICE TABS */
   .office-tabs { display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 4px; margin-bottom: 24px; }
   .office-tab { flex: 1; padding: 10px; text-align: center; border-radius: 7px; cursor: pointer; font-weight: 500; font-size: 14px; transition: all .2s; color: var(--text-muted); border: none; background: none; font-family: 'Noto Sans JP', sans-serif; }
   .office-tab.akita.active { background: var(--akita); color: #fff; }
   .office-tab.yokote.active { background: var(--yokote); color: #fff; }
+  .office-tab.leaders.active { background: var(--leaders); color: #fff; }
   .office-tab:not(.active):hover { color: var(--text); background: var(--bg2); }
 
   /* MEETING LIST */
@@ -127,8 +112,6 @@
   .expand-icon.open { transform: rotate(180deg); }
   .meeting-body { display: none; border-top: 1px solid var(--border); }
   .meeting-body.open { display: block; }
-
-  /* MEMBER TABLE */
   .member-table-wrap { padding: 0 20px 20px; overflow-x: auto; }
   .member-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 16px; }
   .member-table th { text-align: left; padding: 8px 12px; background: var(--bg2); color: var(--text-muted); font-weight: 500; font-size: 11px; letter-spacing: .5px; border-bottom: 1px solid var(--border); }
@@ -143,6 +126,8 @@
 
   /* FORM */
   .form-section { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 32px; box-shadow: 0 2px 16px rgba(139,111,78,.06); }
+  .page-bar { display: flex; align-items: center; margin-bottom: 24px; }
+  .page-title { font-size: 20px; font-weight: 700; }
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
   @media (max-width: 640px) { .form-row { grid-template-columns: 1fr; } }
   .section-label { font-size: 12px; font-weight: 700; padding: 10px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 16px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; }
@@ -150,15 +135,13 @@
   @media (max-width: 700px) { .member-row { grid-template-columns: 1fr 1fr; } }
   .member-name-label { display: flex; align-items: center; font-weight: 700; font-size: 13px; padding-top: 8px; }
   .field-sm label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: 500; }
-  .field-sm input, .field-sm textarea { width: 100%; background: var(--bg2); border: 1px solid var(--border); color: var(--text); padding: 8px 10px; border-radius: 6px; font-family: 'Noto Sans JP', sans-serif; font-size: 13px; outline: none; transition: border-color .2s, box-shadow .2s; }
-  .field-sm input:focus, .field-sm textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-light); }
+  .field-sm input, .field-sm textarea { width: 100%; background: var(--bg2); border: 1px solid var(--border); color: var(--text); padding: 8px 10px; border-radius: 6px; font-family: 'Noto Sans JP', sans-serif; font-size: 13px; outline: none; }
   .field-sm textarea { resize: vertical; min-height: 60px; }
   .btn-row { display: flex; gap: 10px; justify-content: flex-end; margin-top: 28px; }
-  .btn-cancel { background: none; border: 1px solid var(--border); color: var(--text-muted); padding: 10px 24px; border-radius: 8px; cursor: pointer; font-family: 'Noto Sans JP', sans-serif; font-size: 14px; transition: all .2s; }
-  .btn-cancel:hover { border-color: var(--text-muted); color: var(--text); }
-  .btn-save { background: var(--accent); color: #fff; border: none; padding: 10px 28px; border-radius: 8px; font-weight: 700; font-family: 'Noto Sans JP', sans-serif; cursor: pointer; font-size: 14px; transition: background .2s; }
+  .btn-cancel { background: none; border: 1px solid var(--border); color: var(--text-muted); padding: 10px 24px; border-radius: 8px; cursor: pointer; font-family: 'Noto Sans JP', sans-serif; font-size: 14px; }
+  .btn-save { background: var(--accent); color: #fff; border: none; padding: 10px 28px; border-radius: 8px; font-weight: 700; font-family: 'Noto Sans JP', sans-serif; cursor: pointer; font-size: 14px; }
   .btn-save:hover { background: var(--accent2); }
-  .btn-delete { background: none; border: 1px solid var(--danger); color: var(--danger); padding: 10px 20px; border-radius: 8px; cursor: pointer; font-family: 'Noto Sans JP', sans-serif; font-size: 14px; transition: all .2s; margin-right: auto; }
+  .btn-delete { background: none; border: 1px solid var(--danger); color: var(--danger); padding: 10px 20px; border-radius: 8px; cursor: pointer; font-family: 'Noto Sans JP', sans-serif; font-size: 14px; margin-right: auto; }
   .btn-delete:hover { background: var(--danger-light); }
 
   .alert { padding: 12px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; }
@@ -169,11 +152,10 @@
   .empty-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; color: var(--text); }
   .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .6s linear infinite; vertical-align: middle; margin-right: 8px; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .code-block { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 14px; font-family: monospace; font-size: 12px; white-space: pre-wrap; color: var(--accent); margin: 12px 0; max-height: 260px; overflow-y: auto; }
 
   /* カスタムカレンダー */
   .date-picker-wrap { position: relative; }
-  .date-display { width: 100%; background: var(--bg2); border: 1px solid var(--border); color: var(--text); padding: 10px 14px; border-radius: 8px; font-family: 'Noto Sans JP', sans-serif; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: border-color .2s, box-shadow .2s; user-select: none; }
+  .date-display { width: 100%; background: var(--bg2); border: 1px solid var(--border); color: var(--text); padding: 10px 14px; border-radius: 8px; font-family: 'Noto Sans JP', sans-serif; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: border-color .2s; user-select: none; }
   .date-display:hover, .date-display.open { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
   .date-display .cal-icon { color: var(--text-muted); font-size: 15px; }
   .cal-popup { display: none; position: absolute; top: calc(100% + 6px); left: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 8px 32px rgba(44,36,22,.12); z-index: 200; padding: 16px; min-width: 280px; }
@@ -192,39 +174,47 @@
   .cal-day.selected { background: var(--accent); color: #fff !important; font-weight: 700; }
   .cal-day.thursday { background: var(--accent-light); }
   .cal-day.thursday.selected { background: var(--accent); }
+  .cal-day.sunday { color: var(--danger); } .cal-day.saturday { color: var(--akita); }
 
-  .office-tab.leaders.active { background: #a78bc0; color: #fff; }
-  .office-tab.leaders:not(.active):hover { color: var(--text); background: var(--bg2); }
+  /* コピーモーダル */
+  .code-block { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 14px; font-family: monospace; font-size: 12px; white-space: pre-wrap; color: var(--accent); margin: 12px 0; max-height: 260px; overflow-y: auto; }
 
   /* リーダーズMTG */
-  .leaders-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 12px; box-shadow: 0 2px 12px rgba(139,111,78,.06); }
-  .leaders-card-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; background: rgba(139,111,78,.06); border-bottom: 1px solid var(--border); }
-  .leaders-card-title { font-weight: 700; font-size: 15px; color: var(--accent); }
+  .leaders-card { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--leaders); border-radius: 10px; overflow: hidden; margin-bottom: 12px; box-shadow: 0 2px 12px rgba(167,139,192,.06); }
+  .leaders-card-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; background: var(--leaders-light); border-bottom: 1px solid var(--border); }
+  .leaders-card-title { font-weight: 700; font-size: 15px; color: var(--leaders); }
   .leaders-card-date { font-size: 12px; color: var(--text-muted); }
   .leaders-card-body { padding: 20px; }
   .leaders-section-title { font-size: 12px; font-weight: 700; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; padding-bottom: 8px; border-bottom: 1px solid var(--border); margin-bottom: 14px; margin-top: 20px; }
   .leaders-section-title:first-child { margin-top: 0; }
-  .checklist-item { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px dashed var(--border); }
+  .checklist-item { padding: 12px 0; border-bottom: 1px dashed var(--border); }
   .checklist-item:last-child { border-bottom: none; }
-  .checklist-item input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; margin-top: 2px; }
+  .checklist-row { display: flex; align-items: flex-start; gap: 12px; width: 100%; }
+  .checklist-item input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--leaders); cursor: pointer; flex-shrink: 0; margin-top: 2px; }
   .checklist-label { font-size: 14px; line-height: 1.6; color: var(--text); flex: 1; }
   .checklist-label.checked { text-decoration: line-through; color: var(--text-muted); }
-  .memo-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; font-size: 13px; line-height: 1.8; color: var(--text); white-space: pre-wrap; min-height: 80px; }
+  .memo-area { margin-top: 10px; width: 100%; }
+  .memo-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; font-size: 13px; line-height: 1.8; color: var(--text); white-space: pre-wrap; min-height: 60px; width: 100%; }
   .memo-box.empty-memo { color: var(--text-muted); font-style: italic; }
+  .memo-edit-wrap { margin-top: 8px; width: 100%; }
+  .memo-edit-wrap textarea { width: 100%; background: var(--bg2); border: 1px solid var(--border); color: var(--text); padding: 10px 12px; border-radius: 8px; font-family: 'Noto Sans JP', sans-serif; font-size: 13px; outline: none; resize: vertical; min-height: 80px; transition: border-color .2s; }
+  .memo-edit-wrap textarea:focus { border-color: var(--leaders); }
+  .memo-edit-btns { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
+  .btn-memo-edit { background: none; border: 1px solid var(--border); color: var(--text-muted); padding: 4px 12px; border-radius: 6px; cursor: pointer; font-family: 'Noto Sans JP', sans-serif; font-size: 11px; transition: all .2s; margin-top: 6px; }
+  .btn-memo-edit:hover { border-color: var(--leaders); color: var(--leaders); }
 
-  /* リーダーズMTG 管理者フォーム */
-  .leaders-new-btn { display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--accent); color: #fff; border: none; padding: 11px 24px; border-radius: 8px; cursor: pointer; font-family: 'Noto Sans JP', sans-serif; font-size: 14px; font-weight: 700; transition: background .2s; margin-bottom: 20px; }
-  .leaders-new-btn:hover { background: var(--accent2); }
-  .leaders-form { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 28px; margin-bottom: 20px; box-shadow: 0 2px 16px rgba(139,111,78,.06); }
-  .leaders-form-title { font-size: 16px; font-weight: 700; color: var(--accent); margin-bottom: 20px; }
+  /* リーダーズ フォーム */
+  .leaders-new-btn { display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--leaders); color: #fff; border: none; padding: 11px 24px; border-radius: 8px; cursor: pointer; font-family: 'Noto Sans JP', sans-serif; font-size: 14px; font-weight: 700; transition: background .2s; margin-bottom: 20px; }
+  .leaders-new-btn:hover { background: #9070b0; }
+  .leaders-form { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 28px; margin-bottom: 20px; }
+  .leaders-form-title { font-size: 16px; font-weight: 700; color: var(--leaders); margin-bottom: 20px; }
   .checklist-edit-item { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-  .checklist-edit-item input[type=text] { flex: 1; background: var(--bg2); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 6px; font-family: 'Noto Sans JP', sans-serif; font-size: 13px; outline: none; transition: border-color .2s; }
-  .checklist-edit-item input[type=text]:focus { border-color: var(--accent); }
-  .btn-remove-item { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 16px; padding: 4px; transition: color .2s; }
+  .checklist-edit-item input[type=text] { flex: 1; background: var(--bg2); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 6px; font-family: 'Noto Sans JP', sans-serif; font-size: 13px; outline: none; }
+  .checklist-edit-item input[type=text]:focus { border-color: var(--leaders); }
+  .btn-remove-item { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 16px; padding: 4px; }
   .btn-remove-item:hover { color: var(--danger); }
-  .btn-add-item { background: none; border: 1px dashed var(--border); color: var(--text-muted); padding: 7px 16px; border-radius: 6px; cursor: pointer; font-family: 'Noto Sans JP', sans-serif; font-size: 13px; transition: all .2s; margin-top: 4px; }
-  .btn-add-item:hover { border-color: var(--accent); color: var(--accent); }
-  .cal-day.sunday { color: var(--danger); } .cal-day.saturday { color: var(--akita); }
+  .btn-add-item { background: none; border: 1px dashed var(--border); color: var(--text-muted); padding: 7px 16px; border-radius: 6px; cursor: pointer; font-family: 'Noto Sans JP', sans-serif; font-size: 13px; margin-top: 4px; }
+  .btn-add-item:hover { border-color: var(--leaders); color: var(--leaders); }
 </style>
 </head>
 <body>
@@ -284,38 +274,36 @@
 </div>
 
 <!-- MAIN APP -->
-<div class="main" id="app-main" style="display:none;">
-  <div id="page-list">
+<div class="main" id="app-main">
 
-    <!-- お知らせエリア（ティッカー） -->
+  <!-- LIST PAGE -->
+  <div id="page-list">
     <div class="notice-area" id="notice-area">
       <div class="notice-ticker-row">
         <div class="notice-label">📢 お知らせ</div>
         <div class="notice-ticker-wrap" id="notice-ticker-wrap">
-          <div class="notice-empty-ticker" id="notice-ticker-inner">読み込み中...</div>
+          <div class="notice-empty-ticker">読み込み中...</div>
         </div>
       </div>
-      <!-- 管理者パネル（管理者モード時のみ表示） -->
       <div class="notice-admin-panel" id="notice-admin-panel" style="display:none;"></div>
     </div>
 
     <div class="office-tabs">
-      <button class="office-tab akita active" onclick="setOffice('akita', this)">🏢 秋田事業所</button>
-      <button class="office-tab yokote" onclick="setOffice('yokote', this)">🏢 横手事業所</button>
-      <button class="office-tab leaders" id="tab-leaders" onclick="setOffice('leaders', this)">👑 月1リーダーズMTG</button>
+      <button class="office-tab akita active" onclick="setOffice('akita',this)">🏢 秋田事業所</button>
+      <button class="office-tab yokote" onclick="setOffice('yokote',this)">🏢 横手事業所</button>
+      <button class="office-tab leaders" onclick="setOffice('leaders',this)">👑 月1リーダーズMTG</button>
     </div>
     <div id="list-alert"></div>
     <div id="meeting-list" class="meeting-list">
       <div class="empty"><span class="spinner"></span> 読み込み中...</div>
     </div>
-
-    <!-- リーダーズMTGページ -->
     <div id="page-leaders" style="display:none;">
       <div id="leaders-alert"></div>
       <div id="leaders-content"></div>
     </div>
   </div>
 
+  <!-- NEW / EDIT PAGE -->
   <div id="page-new" style="display:none;">
     <div class="page-bar">
       <div class="page-title" id="form-page-title">新規ミーティング入力</div>
@@ -366,22 +354,22 @@
 
 <script>
 var MEMBERS = {
-  akita:  ['二木 暸太郎', '渡部 智也', '藤岡 悠', '本間 祐大', '堀井 博之', '堀井 智恵'],
-  yokote: ['加瀬谷 建', '星野 健太', '佐藤 優太', '沓澤 幸']
+  akita:  ['二木 暸太郎','渡部 智也','藤岡 悠','本間 祐大','堀井 博之','堀井 智恵'],
+  yokote: ['加瀬谷 建','星野 健太','佐藤 優太','沓澤 幸']
 };
 var ADMIN_PW = '1111';
 var SB_URL = 'https://rrsbyiypwgnwzqadwpky.supabase.co';
 var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJyc2J5aXlwd2dud3pxYWR3cGt5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5OTI4NjMsImV4cCI6MjA4OTU2ODg2M30.ZNc4AebnJkBzQFvcxW_Pv2TSEBncyeuapCHE5IAeJQg';
-var sbClient = null, currentOffice = 'akita', editingId = null;
-var isAdmin = false, adminCallback = null;
+var sbClient=null, currentOffice='akita', editingId=null;
+var isAdmin=false, adminCallback=null;
 var calYear=0,calMonth=0,selectedDate='';
 var copyCalYear=0,copyCalMonth=0,copySelectedDate='',copySourceData=null;
 
-window.addEventListener('DOMContentLoaded', function() {
-  sbClient = window.supabase.createClient(SB_URL, SB_KEY);
+window.addEventListener('DOMContentLoaded',function(){
+  sbClient=window.supabase.createClient(SB_URL,SB_KEY);
   showPage('list');
   initCal(); renderMemberFields();
-  document.addEventListener('click', function(e){
+  document.addEventListener('click',function(e){
     var w1=document.getElementById('date-picker-wrap');
     if(w1&&!w1.contains(e.target)) closeCal();
     var w2=document.getElementById('copy-cal-wrap');
@@ -389,22 +377,24 @@ window.addEventListener('DOMContentLoaded', function() {
   });
 });
 
-/* 管理者認証 */
-function toggleAdminMode() {
+/* 管理者 */
+function toggleAdminMode(){
   if(isAdmin){
     isAdmin=false;
     document.getElementById('btn-admin').classList.remove('active');
     document.getElementById('btn-admin').title='管理者モード';
     loadNotices();
+    if(currentOffice==='leaders') loadLeadersMTG();
   } else {
     requireAdmin(function(){
       document.getElementById('btn-admin').classList.add('active');
       document.getElementById('btn-admin').title='管理者モード中（クリックで解除）';
       loadNotices();
+      if(currentOffice==='leaders') loadLeadersMTG();
     });
   }
 }
-function requireAdmin(cb) {
+function requireAdmin(cb){
   if(isAdmin){cb();return;}
   adminCallback=cb;
   document.getElementById('admin-pw-input').value='';
@@ -412,7 +402,7 @@ function requireAdmin(cb) {
   document.getElementById('admin-modal').classList.add('open');
   setTimeout(function(){document.getElementById('admin-pw-input').focus();},100);
 }
-function checkAdminPw() {
+function checkAdminPw(){
   if(document.getElementById('admin-pw-input').value===ADMIN_PW){
     isAdmin=true;
     document.getElementById('admin-modal').classList.remove('open');
@@ -425,89 +415,66 @@ function checkAdminPw() {
 }
 function closeAdminModal(){document.getElementById('admin-modal').classList.remove('open');adminCallback=null;}
 
-
-
 /* お知らせ */
-function loadNotices() {
-  if(!sbClient) return;
+function loadNotices(){
+  if(!sbClient)return;
   sbClient.from('notices').select('*').order('created_at',{ascending:false}).then(function(res){
-    if(res.error){console.error(res.error);return;}
+    if(res.error)return;
     renderNotices(res.data||[]);
   });
 }
-function renderNotices(notices) {
-  var tickerWrap = document.getElementById('notice-ticker-wrap');
-  var adminPanel = document.getElementById('notice-admin-panel');
-
-  // ティッカー描画
-  if(notices.length === 0) {
-    tickerWrap.innerHTML = '<div class="notice-empty-ticker">お知らせはありません</div>';
+function renderNotices(notices){
+  var tw=document.getElementById('notice-ticker-wrap');
+  var ap=document.getElementById('notice-admin-panel');
+  if(notices.length===0){
+    tw.innerHTML='<div class="notice-empty-ticker">お知らせはありません</div>';
   } else {
-    var items = notices.map(function(n){
-      var title = n.title ? '<strong>'+esc(n.title)+'</strong>　' : '';
-      return '<span class="notice-ticker-item">📢 '+title+esc(n.content)+'</span>';
+    var items=notices.map(function(n){
+      var t=n.title?'<strong>'+esc(n.title)+'</strong>　':'';
+      return '<span class="notice-ticker-item">📢 '+t+esc(n.content)+'</span>';
     }).join('<span class="sep">｜</span>');
-    var speed = Math.max(20, notices.length * 12) + 's';
-    tickerWrap.innerHTML = '<div class="notice-ticker-inner" style="animation-duration:'+speed+';">'+items+'<span style="padding:0 48px;color:var(--notice);">｜</span>'+items+'</div>';
+    var spd=Math.max(20,notices.length*12)+'s';
+    tw.innerHTML='<div class="notice-ticker-inner" style="animation-duration:'+spd+';">'+items+'<span style="padding:0 48px;color:var(--notice);">｜</span>'+items+'</div>';
   }
-
-  // 管理者パネル
-  if(isAdmin) {
-    adminPanel.style.display = 'block';
-    var html = '';
-    if(notices.length === 0) {
-      html += '<p style="font-size:13px;color:var(--text-muted);padding:4px 0;">お知らせはありません</p>';
-    } else {
-      notices.forEach(function(n){
-        var d=new Date(n.created_at);
-        var ds=d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate();
-        var titleHtml = n.title ? '<span style="font-weight:700;color:var(--notice);margin-right:6px;">'+esc(n.title)+'</span>' : '';
-        var titleEsc = (n.title||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-        var contentEsc = (n.content||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-        html+='<div class="notice-list-item">'
-          +'<div><div class="notice-list-text">'+titleHtml+esc(n.content)+'</div><div class="notice-list-date">'+ds+'</div></div>'
-          +'<div style="display:flex;gap:4px;">'
-          +'<button class="notice-edit-btn" onclick="editNotice(\''+n.id+'\',\''+titleEsc+'\',\''+contentEsc+'\')" title="編集">✏️</button>'
-          +'<button class="notice-delete" onclick="deleteNotice(\''+n.id+'\')" title="削除">✕</button>'
-          +'</div></div>';
-      });
-    }
+  if(isAdmin){
+    ap.style.display='block';
+    var html='';
+    if(notices.length===0) html+='<p style="font-size:13px;color:var(--text-muted);padding:4px 0;">お知らせはありません</p>';
+    else notices.forEach(function(n){
+      var d=new Date(n.created_at);
+      var ds=d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate();
+      var te=(n.title||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+      var ce=(n.content||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+      html+='<div class="notice-list-item"><div><div class="notice-list-text">'+(n.title?'<span style="font-weight:700;color:var(--notice);margin-right:6px;">'+esc(n.title)+'</span>':'')+esc(n.content)+'</div><div class="notice-list-date">'+ds+'</div></div>'
+        +'<div style="display:flex;gap:4px;">'
+        +'<button class="notice-edit-btn" onclick="editNotice(\''+n.id+'\',\''+te+'\',\''+ce+'\')">✏️</button>'
+        +'<button class="notice-delete" onclick="deleteNotice(\''+n.id+'\')">✕</button>'
+        +'</div></div>';
+    });
     html+='<button class="notice-add-btn" id="notice-add-btn" onclick="showNoticeInput()">＋ お知らせを追加</button>';
     html+='<div class="notice-input-wrap" id="notice-input-wrap" style="display:none;">'
       +'<input type="text" id="notice-title" placeholder="題名" style="width:100%;background:var(--bg2);border:1px solid var(--notice-border);color:var(--text);padding:8px 12px;border-radius:8px;font-family:\'Noto Sans JP\',sans-serif;font-size:13px;outline:none;margin-bottom:8px;">'
       +'<textarea id="notice-text" placeholder="内容を入力..." rows="3" style="width:100%;background:var(--bg2);border:1px solid var(--notice-border);color:var(--text);padding:10px 12px;border-radius:8px;font-family:\'Noto Sans JP\',sans-serif;font-size:13px;outline:none;resize:vertical;min-height:70px;"></textarea>'
-      +'<div class="notice-input-btns">'
-      +'<button class="btn-notice-cancel" onclick="hideNoticeInput()">キャンセル</button>'
-      +'<button class="btn-notice-post" onclick="postNotice()">投稿する</button>'
-      +'</div></div>';
-    adminPanel.innerHTML = html;
-  } else {
-    adminPanel.style.display = 'none';
-  }
+      +'<div class="notice-input-btns"><button class="btn-notice-cancel" onclick="hideNoticeInput()">キャンセル</button><button class="btn-notice-post" onclick="postNotice()">投稿する</button></div></div>';
+    ap.innerHTML=html;
+  } else { ap.style.display='none'; }
 }
-function showNoticeInput(){
-  var el=document.getElementById('notice-input-wrap');
-  if(el){ el.style.display='block'; document.getElementById('notice-title').focus(); }
-}
-function hideNoticeInput(){
-  var el=document.getElementById('notice-input-wrap');
-  if(el) el.style.display='none';
-}
+function showNoticeInput(){var el=document.getElementById('notice-input-wrap');if(el){el.style.display='block';document.getElementById('notice-title').focus();}}
+function hideNoticeInput(){var el=document.getElementById('notice-input-wrap');if(el)el.style.display='none';}
 function postNotice(){
   var title=(document.getElementById('notice-title').value||'').trim();
   var text=(document.getElementById('notice-text').value||'').trim();
-  if(!text){ alert('内容を入力してください。'); return; }
-  sbClient.from('notices').insert({title:title||null, content:text}).then(function(res){if(!res.error)loadNotices();});
+  if(!text){alert('内容を入力してください。');return;}
+  sbClient.from('notices').insert({title:title||null,content:text}).then(function(res){if(!res.error)loadNotices();});
 }
 function deleteNotice(id){
-  if(!confirm('このお知らせを削除しますか？')) return;
+  if(!confirm('このお知らせを削除しますか？'))return;
   sbClient.from('notices').delete().eq('id',id).then(function(res){if(!res.error)loadNotices();});
 }
-function editNotice(id, currentTitle, currentContent) {
-  // 編集モーダルを管理者パネル内に展開
-  var item = event.target.closest('.notice-list-item');
-  if(!item) return;
-  item.innerHTML = '<div style="width:100%;">'
+function editNotice(id,currentTitle,currentContent){
+  var item=event.target.closest('.notice-list-item');
+  if(!item)return;
+  item.innerHTML='<div style="width:100%;">'
     +'<input type="text" id="edit-title-'+id+'" value="'+currentTitle.replace(/"/g,'&quot;')+'" placeholder="題名" style="width:100%;background:var(--bg2);border:1px solid var(--notice-border);color:var(--text);padding:8px 12px;border-radius:8px;font-family:\'Noto Sans JP\',sans-serif;font-size:13px;outline:none;margin-bottom:8px;">'
     +'<textarea id="edit-content-'+id+'" rows="3" style="width:100%;background:var(--bg2);border:1px solid var(--notice-border);color:var(--text);padding:8px 12px;border-radius:8px;font-family:\'Noto Sans JP\',sans-serif;font-size:13px;outline:none;resize:vertical;">'+currentContent+'</textarea>'
     +'<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px;">'
@@ -516,15 +483,17 @@ function editNotice(id, currentTitle, currentContent) {
     +'</div></div>';
   document.getElementById('edit-title-'+id).focus();
 }
-function saveNoticeEdit(id) {
+function saveNoticeEdit(id){
   var title=(document.getElementById('edit-title-'+id).value||'').trim();
   var content=(document.getElementById('edit-content-'+id).value||'').trim();
-  if(!content){ alert('内容を入力してください。'); return; }
-  sbClient.from('notices').update({title:title||null, content:content}).eq('id',id).then(function(res){
-    if(res.error){ alert('更新エラー: '+res.error.message); return; }
+  if(!content){alert('内容を入力してください。');return;}
+  sbClient.from('notices').update({title:title||null,content:content}).eq('id',id).then(function(res){
+    if(res.error){alert('更新エラー: '+res.error.message);return;}
     loadNotices();
   });
 }
+
+/* カレンダー共通 */
 function buildCalGrid(year,month,selected,labelId,gridId,pickFn){
   var DAYS=['日','月','火','水','木','金','土'],today=new Date();today.setHours(0,0,0,0);
   document.getElementById(labelId).textContent=year+'年 '+(month+1)+'月';
@@ -546,14 +515,14 @@ function buildCalGrid(year,month,selected,labelId,gridId,pickFn){
   for(var i=1;i<=rem;i++) html+='<div class="cal-day other-month">'+i+'</div>';
   document.getElementById(gridId).innerHTML=html;
 }
-function initCal(){var today=new Date(),dow=today.getDay(),last=new Date(today);last.setDate(today.getDate()-(dow>=4?dow-4:dow+3));calYear=last.getFullYear();calMonth=last.getMonth();setSelectedDate(last.getFullYear(),last.getMonth()+1,last.getDate());}
+function initCal(){var t=new Date(),dw=t.getDay(),l=new Date(t);l.setDate(t.getDate()-(dw>=4?dw-4:dw+3));calYear=l.getFullYear();calMonth=l.getMonth();setSelectedDate(l.getFullYear(),l.getMonth()+1,l.getDate());}
 function setSelectedDate(y,m,d){var mm=String(m).padStart(2,'0'),dd=String(d).padStart(2,'0');selectedDate=y+'-'+mm+'-'+dd;document.getElementById('f-date').value=selectedDate;document.getElementById('date-display-text').textContent=y+'年'+m+'月'+d+'日';renderCalGrid();}
 function toggleCal(){var p=document.getElementById('cal-popup'),dp=document.getElementById('date-display');if(p.classList.contains('open')){closeCal();}else{p.classList.add('open');dp.classList.add('open');renderCalGrid();}}
 function closeCal(){document.getElementById('cal-popup').classList.remove('open');document.getElementById('date-display').classList.remove('open');}
 function calMove(dir){calMonth+=dir;if(calMonth>11){calMonth=0;calYear++;}if(calMonth<0){calMonth=11;calYear--;}renderCalGrid();}
 function renderCalGrid(){buildCalGrid(calYear,calMonth,selectedDate,'cal-header-label','cal-grid','pickDate');}
 function pickDate(y,m,d){calYear=y;calMonth=m-1;setSelectedDate(y,m,d);closeCal();}
-function initCopyCal(){var today=new Date(),dow=today.getDay(),next=new Date(today);next.setDate(today.getDate()+(dow<=4?4-dow:11-dow));copyCalYear=next.getFullYear();copyCalMonth=next.getMonth();setCopySelectedDate(next.getFullYear(),next.getMonth()+1,next.getDate());}
+function initCopyCal(){var t=new Date(),dw=t.getDay(),n=new Date(t);n.setDate(t.getDate()+(dw<=4?4-dw:11-dw));copyCalYear=n.getFullYear();copyCalMonth=n.getMonth();setCopySelectedDate(n.getFullYear(),n.getMonth()+1,n.getDate());}
 function setCopySelectedDate(y,m,d){var mm=String(m).padStart(2,'0'),dd=String(d).padStart(2,'0');copySelectedDate=y+'-'+mm+'-'+dd;document.getElementById('copy-date-text').textContent=y+'年'+m+'月'+d+'日';renderCopyCalGrid();}
 function toggleCopyCal(){var p=document.getElementById('copy-cal-popup'),dp=document.getElementById('copy-date-display');if(p.classList.contains('open')){closeCopyCal();}else{p.classList.add('open');dp.classList.add('open');renderCopyCalGrid();}}
 function closeCopyCal(){document.getElementById('copy-cal-popup').classList.remove('open');document.getElementById('copy-date-display').classList.remove('open');}
@@ -563,11 +532,10 @@ function pickCopyDate(y,m,d){copyCalYear=y;copyCalMonth=m-1;setCopySelectedDate(
 
 /* APP */
 function showPage(p){
-  document.getElementById('app-main').style.display='none';
-  ['btn-list','btn-new'].forEach(function(id){document.getElementById(id).classList.remove('active');});
   document.getElementById('app-main').style.display='block';
   document.getElementById('page-list').style.display=(p==='list')?'block':'none';
   document.getElementById('page-new').style.display=(p==='new')?'block':'none';
+  ['btn-list','btn-new'].forEach(function(id){document.getElementById(id).classList.remove('active');});
   if(p==='list'){document.getElementById('btn-list').classList.add('active');loadMeetings();loadNotices();}
   if(p==='new') document.getElementById('btn-new').classList.add('active');
 }
@@ -576,20 +544,21 @@ function setOffice(office,el){
   currentOffice=office;
   document.querySelectorAll('.office-tab').forEach(function(b){b.classList.remove('active');});
   el.classList.add('active');
-  document.getElementById('meeting-list').style.display = (office==='leaders') ? 'none' : 'block';
-  document.getElementById('page-leaders').style.display = (office==='leaders') ? 'block' : 'none';
-  if(office==='leaders'){ loadLeadersMTG(); }
-  else { loadMeetings(); }
+  var isl=(office==='leaders');
+  document.getElementById('meeting-list').style.display=isl?'none':'block';
+  document.getElementById('page-leaders').style.display=isl?'block':'none';
+  if(isl) loadLeadersMTG();
+  else loadMeetings();
 }
 function loadMeetings(){
-  var listEl=document.getElementById('meeting-list');
-  listEl.innerHTML='<div class="empty"><span class="spinner"></span> 読み込み中...</div>';
+  var le=document.getElementById('meeting-list');
+  le.innerHTML='<div class="empty"><span class="spinner"></span> 読み込み中...</div>';
   sbClient.from('meetings').select('*, meeting_members(*)').eq('office',currentOffice).order('meeting_date',{ascending:false}).then(function(res){
-    if(res.error) throw res.error;
-    var meetings=res.data;
-    if(!meetings||meetings.length===0){listEl.innerHTML='<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">まだ記録がありません</div><p style="font-size:13px;">「新規入力」からミーティング内容を登録しましょう</p></div>';return;}
-    listEl.innerHTML=meetings.map(function(m){return renderCard(m);}).join('');
-  }).catch(function(e){showAlert('list-alert','error','データ取得エラー: '+(e.message||e));listEl.innerHTML='';});
+    if(res.error)throw res.error;
+    var m=res.data;
+    if(!m||m.length===0){le.innerHTML='<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">まだ記録がありません</div></div>';return;}
+    le.innerHTML=m.map(function(x){return renderCard(x);}).join('');
+  }).catch(function(e){showAlert('list-alert','error','データ取得エラー: '+(e.message||e));le.innerHTML='';});
 }
 function renderCard(m){
   var d=new Date(m.meeting_date+'T00:00:00');
@@ -619,7 +588,7 @@ function renderCard(m){
 function toggleCard(id){document.getElementById(id).classList.toggle('open');document.getElementById('icon-'+id).classList.toggle('open');}
 function openCopyModal(id){
   sbClient.from('meetings').select('*, meeting_members(*)').eq('id',id).single().then(function(res){
-    if(res.error) throw res.error;
+    if(res.error)throw res.error;
     copySourceData=res.data;initCopyCal();
     document.getElementById('copy-modal').classList.add('open');
   }).catch(function(e){showAlert('list-alert','error','エラー: '+(e.message||e));});
@@ -629,34 +598,34 @@ function executeCopy(){
   if(!copySourceData||!copySelectedDate){alert('日付を選択してください。');return;}
   var m=copySourceData;
   sbClient.from('meetings').insert({office:m.office,meeting_date:copySelectedDate,note:m.note}).select().single().then(function(r1){
-    if(r1.error) throw r1.error;
+    if(r1.error)throw r1.error;
     return sbClient.from('meeting_members').insert((m.meeting_members||[]).map(function(mem){return {meeting_id:r1.data.id,member_name:mem.member_name,current_work:mem.current_work,progress:mem.progress,next_plan:mem.next_plan};}));
   }).then(function(r2){
-    if(r2.error) throw r2.error;
+    if(r2.error)throw r2.error;
     closeModal();showAlert('list-alert','success','✅ コピーして作成しました！');loadMeetings();
   }).catch(function(e){showAlert('list-alert','error','コピーエラー: '+(e.message||e));});
 }
 function startEdit(id){
   sbClient.from('meetings').select('*, meeting_members(*)').eq('id',id).single().then(function(res){
-    if(res.error) throw res.error;
+    if(res.error)throw res.error;
     var m=res.data;editingId=id;
     document.getElementById('form-page-title').textContent='✏️ ミーティング編集';
     document.getElementById('btn-delete').style.display='inline-block';
     document.getElementById('f-office').value=m.office;
     document.getElementById('f-office').disabled=true;
-    var parts=m.meeting_date.split('-');
-    calYear=parseInt(parts[0]);calMonth=parseInt(parts[1])-1;
-    setSelectedDate(parseInt(parts[0]),parseInt(parts[1]),parseInt(parts[2]));
+    var p=m.meeting_date.split('-');
+    calYear=parseInt(p[0]);calMonth=parseInt(p[1])-1;
+    setSelectedDate(parseInt(p[0]),parseInt(p[1]),parseInt(p[2]));
     document.getElementById('f-note').value=m.note||'';
     renderMemberFields();
     (m.meeting_members||[]).forEach(function(mem){
-      var wEl=document.getElementById('work-'+mem.member_name);
-      var pEl=document.getElementById('prog-'+mem.member_name);
-      var nEl=document.getElementById('next-'+mem.member_name);
-      if(wEl)wEl.value=mem.current_work||'';if(pEl)pEl.value=mem.progress||0;if(nEl)nEl.value=mem.next_plan||'';
+      var w=document.getElementById('work-'+mem.member_name);
+      var pg=document.getElementById('prog-'+mem.member_name);
+      var n=document.getElementById('next-'+mem.member_name);
+      if(w)w.value=mem.current_work||'';if(pg)pg.value=mem.progress||0;if(n)n.value=mem.next_plan||'';
     });
     showPage('new');
-  }).catch(function(e){showAlert('list-alert','error','編集データ取得エラー: '+(e.message||e));});
+  }).catch(function(e){showAlert('list-alert','error','編集エラー: '+(e.message||e));});
 }
 function renderMemberFields(){
   var office=document.getElementById('f-office').value,mems=MEMBERS[office];
@@ -664,14 +633,13 @@ function renderMemberFields(){
   document.getElementById('members-section-label').textContent='👥 '+label+' メンバー別作業状況';
   document.getElementById('member-fields').innerHTML=mems.map(function(name){
     return '<div class="member-row"><div class="member-name-label">'+name+'</div>'
-      +'<div class="field-sm"><label>今週の作業状況</label><textarea id="work-'+name+'" placeholder="作業内容..." rows="2"></textarea></div>'
+      +'<div class="field-sm"><label>今週の作業状況</label><textarea id="work-'+name+'" rows="2"></textarea></div>'
       +'<div class="field-sm"><label>進捗率 (%)</label><input type="number" id="prog-'+name+'" min="0" max="100" value="0"></div>'
-      +'<div class="field-sm"><label>来週の作業予定</label><textarea id="next-'+name+'" placeholder="予定内容..." rows="2"></textarea></div>'
+      +'<div class="field-sm"><label>来週の作業予定</label><textarea id="next-'+name+'" rows="2"></textarea></div>'
       +'</div>';
   }).join('');
 }
 function saveMeeting(){
-  if(!sbClient){showPage('setup');return;}
   var office=document.getElementById('f-office').value,date=document.getElementById('f-date').value,note=document.getElementById('f-note').value.trim();
   if(!date){showAlert('new-alert','error','日付を選択してください。');return;}
   var members=MEMBERS[office].map(function(name){
@@ -679,157 +647,125 @@ function saveMeeting(){
   });
   if(editingId){
     sbClient.from('meetings').update({meeting_date:date,note:note}).eq('id',editingId).then(function(r1){
-      if(r1.error) throw r1.error;
+      if(r1.error)throw r1.error;
       return sbClient.from('meeting_members').delete().eq('meeting_id',editingId);
     }).then(function(r2){
-      if(r2.error) throw r2.error;
+      if(r2.error)throw r2.error;
       return sbClient.from('meeting_members').insert(members.map(function(m){return Object.assign({},m,{meeting_id:editingId});}));
     }).then(function(r3){
-      if(r3.error) throw r3.error;
+      if(r3.error)throw r3.error;
       showAlert('new-alert','success','✅ 更新しました！');editingId=null;
       setTimeout(function(){showPage('list');},1000);
     }).catch(function(e){showAlert('new-alert','error','更新エラー: '+(e.message||e));});
   } else {
     sbClient.from('meetings').insert({office:office,meeting_date:date,note:note}).select().single().then(function(r1){
-      if(r1.error) throw r1.error;
+      if(r1.error)throw r1.error;
       return sbClient.from('meeting_members').insert(members.map(function(m){return Object.assign({},m,{meeting_id:r1.data.id});}));
     }).then(function(r2){
-      if(r2.error) throw r2.error;
+      if(r2.error)throw r2.error;
       showAlert('new-alert','success','✅ 保存しました！');
       setTimeout(function(){document.getElementById('f-note').value='';renderMemberFields();initCal();editingId=null;showPage('list');},1000);
     }).catch(function(e){showAlert('new-alert','error','保存エラー: '+(e.message||e));});
   }
 }
 function deleteMeeting(){
-  if(!editingId) return;
-  if(!confirm('このミーティング記録を削除しますか？\nこの操作は元に戻せません。')) return;
+  if(!editingId)return;
+  if(!confirm('このミーティング記録を削除しますか？'))return;
   sbClient.from('meetings').delete().eq('id',editingId).then(function(res){
-    if(res.error) throw res.error;editingId=null;showPage('list');
+    if(res.error)throw res.error;editingId=null;showPage('list');
   }).catch(function(e){showAlert('new-alert','error','削除エラー: '+(e.message||e));});
 }
-function showAlert(id,type,msg){
-  var el=document.getElementById(id);if(!el)return;
-  el.innerHTML='<div class="alert alert-'+type+'">'+msg+'</div>';
-  if(type==='success')setTimeout(function(){el.innerHTML='';},3000);
-}
-/* ── リーダーズMTG ── */
-var editingLeadersId = null;
 
-function loadLeadersMTG() {
-  var cont = document.getElementById('leaders-content');
-  cont.innerHTML = '<div class="empty"><span class="spinner"></span> 読み込み中...</div>';
-
-  // Step1: MTG + チェックリスト取得
-  sbClient.from('leaders_mtg')
-    .select('*, leaders_checklist(*)')
-    .order('mtg_date',{ascending:false})
-    .then(function(res){
-      if(res.error){ cont.innerHTML='<div class="empty">読み込みエラー: '+res.error.message+'</div>'; return; }
-      var records = res.data||[];
-      if(records.length === 0){ renderLeadersMTG([]); return; }
-
-      // Step2: 全チェックリストIDに対するメモを取得
-      var allItemIds = [];
+/* リーダーズMTG */
+function loadLeadersMTG(){
+  var cont=document.getElementById('leaders-content');
+  cont.innerHTML='<div class="empty"><span class="spinner"></span> 読み込み中...</div>';
+  sbClient.from('leaders_mtg').select('*, leaders_checklist(*)').order('mtg_date',{ascending:false}).then(function(res){
+    if(res.error){cont.innerHTML='<div class="empty">読み込みエラー: '+res.error.message+'</div>';return;}
+    var records=res.data||[];
+    if(records.length===0){renderLeadersMTG([]);return;}
+    var allIds=[];
+    records.forEach(function(r){(r.leaders_checklist||[]).forEach(function(item){allIds.push(item.id);});});
+    if(allIds.length===0){renderLeadersMTG(records);return;}
+    sbClient.from('leaders_memo').select('*').in('checklist_id',allIds).then(function(mr){
+      var memoMap={};
+      (mr.data||[]).forEach(function(m){memoMap[m.checklist_id]=m;});
       records.forEach(function(r){
-        (r.leaders_checklist||[]).forEach(function(item){ allItemIds.push(item.id); });
-      });
-
-      if(allItemIds.length === 0){ renderLeadersMTG(records); return; }
-
-      sbClient.from('leaders_memo')
-        .select('*')
-        .in('checklist_id', allItemIds)
-        .then(function(memoRes){
-          if(memoRes.error){ renderLeadersMTG(records); return; }
-          var memoMap = {};
-          (memoRes.data||[]).forEach(function(m){ memoMap[m.checklist_id] = m; });
-          // チェックリストにメモをマージ
-          records.forEach(function(r){
-            (r.leaders_checklist||[]).forEach(function(item){
-              item.leaders_memo = memoMap[item.id] ? [memoMap[item.id]] : [];
-            });
-          });
-          renderLeadersMTG(records);
+        (r.leaders_checklist||[]).forEach(function(item){
+          item.memo=memoMap[item.id]||null;
         });
+      });
+      renderLeadersMTG(records);
     });
+  });
 }
 
-function renderLeadersMTG(records) {
-  var cont = document.getElementById('leaders-content');
-  var html = '';
-
-  if(isAdmin) {
-    html += '<button class="leaders-new-btn" onclick="showLeadersForm()">＋ 新規リーダーズMTG作成</button>';
-    html += '<div id="leaders-form-wrap" style="display:none;"></div>';
+function renderLeadersMTG(records){
+  var cont=document.getElementById('leaders-content');
+  var html='';
+  if(isAdmin){
+    html+='<button class="leaders-new-btn" onclick="showLeadersForm()">＋ 新規リーダーズMTG作成</button>';
+    html+='<div id="leaders-form-wrap" style="display:none;"></div>';
   }
-
-  if(records.length === 0) {
-    html += '<div class="empty"><div class="empty-icon">👑</div><div class="empty-title">まだ記録がありません</div></div>';
+  if(records.length===0){
+    html+='<div class="empty"><div class="empty-icon">👑</div><div class="empty-title">まだ記録がありません</div></div>';
   } else {
     records.forEach(function(r){
-      var d = new Date(r.mtg_date+'T00:00:00');
-      var ds = d.getFullYear()+'年'+(d.getMonth()+1)+'月';
-      var checklist = (r.leaders_checklist||[]).sort(function(a,b){return a.sort_order-b.sort_order;});
-
-      var checkHtml = checklist.map(function(item){
-        var memo = (item.leaders_memo&&item.leaders_memo[0]) || null;
-        var memoContent = memo && memo.content ? memo.content : '';
-        var cls = item.checked ? 'checklist-label checked' : 'checklist-label';
-        var chkAttr = isAdmin ? ' onchange="toggleCheck(\''+item.id+'\',this)"' : ' disabled';
-
-        // メモ表示・編集エリア
-        var memoHtml = '<div style="margin-left:30px;margin-top:6px;">'
+      var d=new Date(r.mtg_date+'T00:00:00');
+      var ds=d.getFullYear()+'年'+(d.getMonth()+1)+'月';
+      var checklist=(r.leaders_checklist||[]).sort(function(a,b){return a.sort_order-b.sort_order;});
+      var checkHtml=checklist.map(function(item){
+        var memo=item.memo||null;
+        var memoContent=memo&&memo.content?memo.content:'';
+        var cls=item.checked?'checklist-label checked':'checklist-label';
+        var chkAttr=isAdmin?' onchange="toggleCheck(\''+item.id+'\',this)"':' disabled';
+        var memoId=memo?memo.id:null;
+        var memoDisp='<div class="memo-area">'
           +'<div class="memo-box '+(memoContent?'':'empty-memo')+'" id="memo-disp-'+item.id+'">'+(memoContent?esc(memoContent):'メモなし')+'</div>';
         if(isAdmin){
-          var memoId = memo ? memo.id : null;
-          memoHtml += '<div id="memo-edit-wrap-'+item.id+'" style="display:none;margin-top:6px;">'
-            +'<textarea id="memo-ta-'+item.id+'" rows="3" style="width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:8px;font-family:\'Noto Sans JP\',sans-serif;font-size:13px;outline:none;resize:vertical;">'+esc(memoContent)+'</textarea>'
-            +'<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">'
+          memoDisp+='<div class="memo-edit-wrap" id="memo-edit-wrap-'+item.id+'" style="display:none;">'
+            +'<textarea id="memo-ta-'+item.id+'" rows="4">'+esc(memoContent)+'</textarea>'
+            +'<div class="memo-edit-btns">'
             +'<button class="btn-cancel" onclick="closeMemoEdit(\''+item.id+'\')">キャンセル</button>'
-            +'<button class="btn-save" onclick="saveMemo(\''+item.id+'\','+(memoId?'\''+memoId+'\'':'null')+',\''+r.id+'\')">💾 保存</button>'
+            +'<button class="btn-save" onclick="saveMemo(\''+item.id+'\','+(memoId?'\''+memoId+'\'':'null')+')">💾 保存</button>'
             +'</div></div>'
-            +'<button class="btn-edit" style="margin-top:6px;font-size:11px;" onclick="openMemoEdit(\''+item.id+'\')">✏️ メモ編集</button>';
+            +'<button class="btn-memo-edit" id="memo-btn-'+item.id+'" onclick="openMemoEdit(\''+item.id+'\')">✏️ メモ編集</button>';
         }
-        memoHtml += '</div>';
-
-        return '<div class="checklist-item" style="flex-direction:column;align-items:flex-start;">'
-          +'<div style="display:flex;align-items:flex-start;gap:12px;width:100%;">'
-          +'<input type="checkbox" '+(item.checked?'checked':'')+chkAttr+' style="margin-top:3px;">'
+        memoDisp+='</div>';
+        return '<div class="checklist-item">'
+          +'<div class="checklist-row">'
+          +'<input type="checkbox" '+(item.checked?'checked':'')+chkAttr+'>'
           +'<span class="'+cls+'" id="cl-label-'+item.id+'">'+esc(item.label)+'</span>'
           +'</div>'
-          +memoHtml
+          +memoDisp
           +'</div>';
       }).join('');
-
-      // 編集ボタン（管理者のみ）
-      var editBtn = isAdmin
-        ? '<button class="btn-edit" onclick="showEditLeadersForm(\''+r.id+'\')">✏️ 編集</button>'
-          +'<button class="btn-edit" style="border-color:var(--danger);color:var(--danger);" onclick="deleteLeadersMTG(\''+r.id+'\')">🗑 削除</button>'
-        : '';
-
-      html += '<div class="leaders-card">'
+      var editBtns=isAdmin
+        ?'<button class="btn-edit" onclick="showEditLeadersForm(\''+r.id+'\')">✏️ 編集</button>'
+         +'<button class="btn-edit" style="border-color:var(--danger);color:var(--danger);" onclick="deleteLeadersMTG(\''+r.id+'\')">🗑 削除</button>'
+        :'';
+      html+='<div class="leaders-card">'
         +'<div class="leaders-card-header">'
         +'<div class="leaders-card-title">👑 '+ds+' リーダーズMTG</div>'
-        +'<div style="display:flex;align-items:center;gap:8px;">'+editBtn+'<span class="leaders-card-date">'+r.mtg_date+'</span></div>'
+        +'<div style="display:flex;align-items:center;gap:8px;">'+editBtns+'<span class="leaders-card-date">'+r.mtg_date+'</span></div>'
         +'</div>'
-        +'<div class="leaders-card-body" id="leaders-edit-area-'+r.id+'">'
+        +'<div class="leaders-card-body" id="leaders-body-'+r.id+'">'
         +'<div class="leaders-section-title">✅ 確認事項 / メモ</div>'
         +(checkHtml||'<p style="font-size:13px;color:var(--text-muted);">確認事項なし</p>')
         +'</div></div>';
     });
   }
-  cont.innerHTML = html;
+  cont.innerHTML=html;
 }
 
-/* 新規作成フォーム */
-function showLeadersForm() {
-  var wrap = document.getElementById('leaders-form-wrap');
-  wrap.style.display = 'block';
-  var today = new Date();
-  var dateVal = today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
-  wrap.innerHTML = '<div class="leaders-form" id="lf-form">'
+function showLeadersForm(){
+  var wrap=document.getElementById('leaders-form-wrap');
+  wrap.style.display='block';
+  var today=new Date();
+  var dv=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+  wrap.innerHTML='<div class="leaders-form">'
     +'<div class="leaders-form-title">新規リーダーズMTG作成</div>'
-    +'<div class="field"><label>開催日</label><input type="date" id="lf-date" value="'+dateVal+'"></div>'
+    +'<div class="field"><label>開催日</label><input type="date" id="lf-date" value="'+dv+'"></div>'
     +'<div class="leaders-section-title">✅ 確認事項</div>'
     +'<div id="lf-items"></div>'
     +'<button class="btn-add-item" onclick="addCheckItem(\'lf-items\')">＋ 項目を追加</button>'
@@ -839,149 +775,119 @@ function showLeadersForm() {
     +'</div></div>';
   addCheckItem('lf-items');
 }
-
-/* 既存MTG編集フォーム */
-function showEditLeadersForm(mtgId) {
-  sbClient.from('leaders_mtg')
-    .select('*, leaders_checklist(*)')
-    .eq('id', mtgId).single()
-    .then(function(res){
-      if(res.error){ alert('読み込みエラー'); return; }
-      var r = res.data;
-      var checklist = (r.leaders_checklist||[]).sort(function(a,b){return a.sort_order-b.sort_order;});
-      var area = document.getElementById('leaders-edit-area-'+mtgId);
-      var itemsHtml = checklist.map(function(item,i){
-        return '<div class="checklist-edit-item" id="ef-item-'+item.id+'" data-existing-id="'+item.id+'">'
-          +'<input type="text" value="'+item.label.replace(/"/g,'&quot;')+'" id="ef-label-'+item.id+'">'
-          +'<button class="btn-remove-item" onclick="removeCheckItem(\'ef-item-'+item.id+'\')">✕</button>'
-          +'</div>';
-      }).join('');
-      area.innerHTML = '<div class="leaders-form" style="box-shadow:none;padding:0;">'
-        +'<div class="leaders-section-title">✅ 確認事項を編集</div>'
-        +'<div id="ef-items-'+mtgId+'">'+itemsHtml+'</div>'
-        +'<button class="btn-add-item" onclick="addCheckItem(\'ef-items-'+mtgId+'\')">＋ 項目を追加</button>'
-        +'<div class="btn-row" style="margin-top:16px;">'
-        +'<button class="btn-cancel" onclick="loadLeadersMTG()">キャンセル</button>'
-        +'<button class="btn-save" onclick="saveEditLeaders(\''+mtgId+'\')">💾 保存する</button>'
-        +'</div></div>';
-    });
-}
-
-function saveEditLeaders(mtgId) {
-  var container = document.getElementById('ef-items-'+mtgId);
-  var items = [];
-  container.querySelectorAll('.checklist-edit-item').forEach(function(el,i){
-    var inp = el.querySelector('input[type=text]');
-    var existingId = el.getAttribute('data-existing-id');
-    if(inp && inp.value.trim()){
-      items.push({ existingId: existingId||null, label: inp.value.trim(), sort_order: i });
-    }
+function hideLeadersForm(){var w=document.getElementById('leaders-form-wrap');if(w)w.style.display='none';}
+function showEditLeadersForm(mtgId){
+  sbClient.from('leaders_mtg').select('*, leaders_checklist(*)').eq('id',mtgId).single().then(function(res){
+    if(res.error){alert('読み込みエラー');return;}
+    var r=res.data;
+    var checklist=(r.leaders_checklist||[]).sort(function(a,b){return a.sort_order-b.sort_order;});
+    var body=document.getElementById('leaders-body-'+mtgId);
+    var itemsHtml=checklist.map(function(item){
+      return '<div class="checklist-edit-item" id="ef-item-'+item.id+'" data-existing-id="'+item.id+'">'
+        +'<input type="text" value="'+item.label.replace(/"/g,'&quot;')+'" id="ef-label-'+item.id+'">'
+        +'<button class="btn-remove-item" onclick="removeCheckItem(\'ef-item-'+item.id+'\')">✕</button>'
+        +'</div>';
+    }).join('');
+    body.innerHTML='<div style="padding:4px 0;">'
+      +'<div class="leaders-section-title">✅ 確認事項を編集</div>'
+      +'<div id="ef-items-'+mtgId+'">'+itemsHtml+'</div>'
+      +'<button class="btn-add-item" onclick="addCheckItem(\'ef-items-'+mtgId+'\')">＋ 項目を追加</button>'
+      +'<div class="btn-row" style="margin-top:16px;">'
+      +'<button class="btn-cancel" onclick="loadLeadersMTG()">キャンセル</button>'
+      +'<button class="btn-save" onclick="saveEditLeaders(\''+mtgId+'\')">💾 保存する</button>'
+      +'</div></div>';
   });
-
-  // 既存を全削除して再挿入
-  sbClient.from('leaders_checklist').delete().eq('mtg_id', mtgId).then(function(r1){
-    if(r1.error) throw r1.error;
-    if(items.length === 0) { loadLeadersMTG(); return; }
-    var rows = items.map(function(item){
-      return { mtg_id: mtgId, label: item.label, sort_order: item.sort_order, checked: false };
-    });
-    return sbClient.from('leaders_checklist').insert(rows);
+}
+function saveEditLeaders(mtgId){
+  var items=[];
+  document.querySelectorAll('#ef-items-'+mtgId+' .checklist-edit-item').forEach(function(el,i){
+    var inp=el.querySelector('input[type=text]');
+    if(inp&&inp.value.trim()) items.push({label:inp.value.trim(),sort_order:i});
+  });
+  sbClient.from('leaders_checklist').delete().eq('mtg_id',mtgId).then(function(r1){
+    if(r1.error)throw r1.error;
+    if(items.length===0){loadLeadersMTG();return;}
+    return sbClient.from('leaders_checklist').insert(items.map(function(item){return Object.assign({},item,{mtg_id:mtgId,checked:false});}));
   }).then(function(r2){
-    if(r2&&r2.error) throw r2.error;
+    if(r2&&r2.error)throw r2.error;
     showAlert('leaders-alert','success','✅ 確認事項を更新しました！');
     loadLeadersMTG();
-  }).catch(function(e){ alert('更新エラー: '+(e.message||e)); });
+  }).catch(function(e){alert('更新エラー: '+(e.message||e));});
 }
-
-function hideLeadersForm() {
-  var wrap = document.getElementById('leaders-form-wrap');
-  if(wrap) wrap.style.display='none';
-}
-
-function addCheckItem(containerId) {
-  var cont = document.getElementById(containerId);
-  if(!cont) return;
-  var idx = Date.now();
-  var div = document.createElement('div');
-  div.className = 'checklist-edit-item';
-  div.id = 'lf-item-'+idx;
-  div.innerHTML = '<input type="text" placeholder="確認事項を入力..." id="lf-label-'+idx+'">'
+function addCheckItem(containerId){
+  var cont=document.getElementById(containerId);if(!cont)return;
+  var idx=Date.now();
+  var div=document.createElement('div');
+  div.className='checklist-edit-item';div.id='lf-item-'+idx;
+  div.innerHTML='<input type="text" placeholder="確認事項を入力..." id="lf-label-'+idx+'">'
     +'<button class="btn-remove-item" onclick="removeCheckItem(\'lf-item-'+idx+'\')">✕</button>';
   cont.appendChild(div);
   document.getElementById('lf-label-'+idx).focus();
 }
-
-function removeCheckItem(id) {
-  var el = document.getElementById(id);
-  if(el) el.remove();
-}
-
-function saveLeadersMTG() {
-  var date = document.getElementById('lf-date').value;
-  if(!date){ alert('開催日を入力してください。'); return; }
-  var items = [];
+function removeCheckItem(id){var el=document.getElementById(id);if(el)el.remove();}
+function saveLeadersMTG(){
+  var date=document.getElementById('lf-date').value;
+  if(!date){alert('開催日を入力してください。');return;}
+  var items=[];
   document.querySelectorAll('#lf-items .checklist-edit-item').forEach(function(el,i){
-    var inp = el.querySelector('input[type=text]');
-    if(inp && inp.value.trim()) items.push({label:inp.value.trim(), sort_order:i, checked:false});
+    var inp=el.querySelector('input[type=text]');
+    if(inp&&inp.value.trim()) items.push({label:inp.value.trim(),sort_order:i,checked:false});
   });
   sbClient.from('leaders_mtg').insert({mtg_date:date}).select().single().then(function(r1){
-    if(r1.error) throw r1.error;
-    if(items.length===0){ hideLeadersForm(); showAlert('leaders-alert','success','✅ 作成しました！'); loadLeadersMTG(); return; }
-    var rows = items.map(function(item){ return Object.assign({},item,{mtg_id:r1.data.id}); });
-    return sbClient.from('leaders_checklist').insert(rows);
+    if(r1.error)throw r1.error;
+    if(items.length===0){hideLeadersForm();showAlert('leaders-alert','success','✅ 作成しました！');loadLeadersMTG();return;}
+    return sbClient.from('leaders_checklist').insert(items.map(function(item){return Object.assign({},item,{mtg_id:r1.data.id});}));
   }).then(function(r2){
-    if(r2&&r2.error) throw r2.error;
-    hideLeadersForm();
-    showAlert('leaders-alert','success','✅ リーダーズMTGを作成しました！');
-    loadLeadersMTG();
-  }).catch(function(e){ alert('保存エラー: '+(e.message||e)); });
+    if(r2&&r2.error)throw r2.error;
+    hideLeadersForm();showAlert('leaders-alert','success','✅ リーダーズMTGを作成しました！');loadLeadersMTG();
+  }).catch(function(e){alert('保存エラー: '+(e.message||e));});
 }
-
-function deleteLeadersMTG(id) {
-  if(!confirm('このリーダーズMTGを削除しますか？')) return;
+function deleteLeadersMTG(id){
+  if(!confirm('このリーダーズMTGを削除しますか？'))return;
   sbClient.from('leaders_mtg').delete().eq('id',id).then(function(res){
-    if(res.error){ alert('削除エラー: '+res.error.message); return; }
+    if(res.error){alert('削除エラー: '+res.error.message);return;}
     loadLeadersMTG();
   });
 }
-
-function toggleCheck(itemId, checkbox) {
+function toggleCheck(itemId,checkbox){
   sbClient.from('leaders_checklist').update({checked:checkbox.checked}).eq('id',itemId).then(function(res){
-    if(res.error){ alert('更新エラー'); checkbox.checked=!checkbox.checked; return; }
-    var label = document.getElementById('cl-label-'+itemId);
-    if(label){ if(checkbox.checked){label.classList.add('checked');}else{label.classList.remove('checked');} }
+    if(res.error){alert('更新エラー');checkbox.checked=!checkbox.checked;return;}
+    var lbl=document.getElementById('cl-label-'+itemId);
+    if(lbl){if(checkbox.checked)lbl.classList.add('checked');else lbl.classList.remove('checked');}
   });
 }
-
-function openMemoEdit(itemId) {
+function openMemoEdit(itemId){
   document.getElementById('memo-disp-'+itemId).style.display='none';
   document.getElementById('memo-edit-wrap-'+itemId).style.display='block';
-  var btn = document.querySelector('[onclick="openMemoEdit(\''+itemId+'\')"]');
-  if(btn) btn.style.display='none';
+  var btn=document.getElementById('memo-btn-'+itemId);
+  if(btn)btn.style.display='none';
 }
-
-function closeMemoEdit(itemId) {
+function closeMemoEdit(itemId){
   document.getElementById('memo-disp-'+itemId).style.display='block';
   document.getElementById('memo-edit-wrap-'+itemId).style.display='none';
-  var btn = document.querySelector('[onclick="openMemoEdit(\''+itemId+'\')"]');
-  if(btn) btn.style.display='inline-block';
+  var btn=document.getElementById('memo-btn-'+itemId);
+  if(btn)btn.style.display='inline-block';
 }
-
-function saveMemo(itemId, memoId, mtgId) {
-  var ta = document.getElementById('memo-ta-'+itemId);
-  var content = ta ? ta.value.trim() : '';
+function saveMemo(itemId,memoId){
+  var ta=document.getElementById('memo-ta-'+itemId);
+  var content=ta?ta.value.trim():'';
   var promise;
-  if(memoId && memoId !== 'null') {
-    promise = sbClient.from('leaders_memo').update({content:content}).eq('id',memoId);
+  if(memoId&&memoId!=='null'){
+    promise=sbClient.from('leaders_memo').update({content:content}).eq('id',memoId);
   } else {
-    promise = sbClient.from('leaders_memo').insert({checklist_id:itemId, content:content});
+    promise=sbClient.from('leaders_memo').insert({checklist_id:itemId,content:content});
   }
   promise.then(function(res){
-    if(res.error){ alert('保存エラー: '+res.error.message); return; }
+    if(res.error){alert('保存エラー: '+res.error.message);return;}
     loadLeadersMTG();
   });
 }
 
+function showAlert(id,type,msg){
+  var el=document.getElementById(id);if(!el)return;
+  el.innerHTML='<div class="alert alert-'+type+'">'+msg+'</div>';
+  if(type==='success')setTimeout(function(){el.innerHTML='';},3000);
+}
 function esc(str){return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
 </script>
 </body>
