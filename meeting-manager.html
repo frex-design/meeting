@@ -192,7 +192,8 @@
   .cal-day.selected { background: var(--accent); color: #fff !important; font-weight: 700; }
   .cal-day.thursday { background: var(--accent-light); }
   .cal-day.thursday.selected { background: var(--accent); }
-  .office-tab.leaders.active { background: #8b6f4e; color: #fff; }
+
+  .office-tab.leaders.active { background: #a78bc0; color: #fff; }
   .office-tab.leaders:not(.active):hover { color: var(--text); background: var(--bg2); }
 
   /* リーダーズMTG */
@@ -713,22 +714,50 @@ function showAlert(id,type,msg){
 }
 /* ── リーダーズMTG ── */
 var editingLeadersId = null;
-var editingMemoId = null;
 
 function loadLeadersMTG() {
   var cont = document.getElementById('leaders-content');
   cont.innerHTML = '<div class="empty"><span class="spinner"></span> 読み込み中...</div>';
-  sbClient.from('leaders_mtg').select('*, leaders_checklist(*), leaders_memo(*)').order('mtg_date',{ascending:false}).then(function(res){
-    if(res.error){ cont.innerHTML='<div class="empty">読み込みエラー</div>'; return; }
-    renderLeadersMTG(res.data||[]);
-  });
+
+  // Step1: MTG + チェックリスト取得
+  sbClient.from('leaders_mtg')
+    .select('*, leaders_checklist(*)')
+    .order('mtg_date',{ascending:false})
+    .then(function(res){
+      if(res.error){ cont.innerHTML='<div class="empty">読み込みエラー: '+res.error.message+'</div>'; return; }
+      var records = res.data||[];
+      if(records.length === 0){ renderLeadersMTG([]); return; }
+
+      // Step2: 全チェックリストIDに対するメモを取得
+      var allItemIds = [];
+      records.forEach(function(r){
+        (r.leaders_checklist||[]).forEach(function(item){ allItemIds.push(item.id); });
+      });
+
+      if(allItemIds.length === 0){ renderLeadersMTG(records); return; }
+
+      sbClient.from('leaders_memo')
+        .select('*')
+        .in('checklist_id', allItemIds)
+        .then(function(memoRes){
+          if(memoRes.error){ renderLeadersMTG(records); return; }
+          var memoMap = {};
+          (memoRes.data||[]).forEach(function(m){ memoMap[m.checklist_id] = m; });
+          // チェックリストにメモをマージ
+          records.forEach(function(r){
+            (r.leaders_checklist||[]).forEach(function(item){
+              item.leaders_memo = memoMap[item.id] ? [memoMap[item.id]] : [];
+            });
+          });
+          renderLeadersMTG(records);
+        });
+    });
 }
 
 function renderLeadersMTG(records) {
   var cont = document.getElementById('leaders-content');
   var html = '';
 
-  // 管理者なら新規作成ボタン表示
   if(isAdmin) {
     html += '<button class="leaders-new-btn" onclick="showLeadersForm()">＋ 新規リーダーズMTG作成</button>';
     html += '<div id="leaders-form-wrap" style="display:none;"></div>';
@@ -741,66 +770,127 @@ function renderLeadersMTG(records) {
       var d = new Date(r.mtg_date+'T00:00:00');
       var ds = d.getFullYear()+'年'+(d.getMonth()+1)+'月';
       var checklist = (r.leaders_checklist||[]).sort(function(a,b){return a.sort_order-b.sort_order;});
-      var memo = (r.leaders_memo&&r.leaders_memo[0]) || null;
 
       var checkHtml = checklist.map(function(item){
+        var memo = (item.leaders_memo&&item.leaders_memo[0]) || null;
+        var memoContent = memo && memo.content ? memo.content : '';
         var cls = item.checked ? 'checklist-label checked' : 'checklist-label';
-        var adminChange = isAdmin ? ' onchange="toggleCheck(\''+item.id+'\',this)"' : ' disabled';
-        return '<div class="checklist-item">'
-          +'<input type="checkbox" '+(item.checked?'checked':'')+adminChange+'>'
+        var chkAttr = isAdmin ? ' onchange="toggleCheck(\''+item.id+'\',this)"' : ' disabled';
+
+        // メモ表示・編集エリア
+        var memoHtml = '<div style="margin-left:30px;margin-top:6px;">'
+          +'<div class="memo-box '+(memoContent?'':'empty-memo')+'" id="memo-disp-'+item.id+'">'+(memoContent?esc(memoContent):'メモなし')+'</div>';
+        if(isAdmin){
+          var memoId = memo ? memo.id : null;
+          memoHtml += '<div id="memo-edit-wrap-'+item.id+'" style="display:none;margin-top:6px;">'
+            +'<textarea id="memo-ta-'+item.id+'" rows="3" style="width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:8px;font-family:\'Noto Sans JP\',sans-serif;font-size:13px;outline:none;resize:vertical;">'+esc(memoContent)+'</textarea>'
+            +'<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">'
+            +'<button class="btn-cancel" onclick="closeMemoEdit(\''+item.id+'\')">キャンセル</button>'
+            +'<button class="btn-save" onclick="saveMemo(\''+item.id+'\','+(memoId?'\''+memoId+'\'':'null')+',\''+r.id+'\')">💾 保存</button>'
+            +'</div></div>'
+            +'<button class="btn-edit" style="margin-top:6px;font-size:11px;" onclick="openMemoEdit(\''+item.id+'\')">✏️ メモ編集</button>';
+        }
+        memoHtml += '</div>';
+
+        return '<div class="checklist-item" style="flex-direction:column;align-items:flex-start;">'
+          +'<div style="display:flex;align-items:flex-start;gap:12px;width:100%;">'
+          +'<input type="checkbox" '+(item.checked?'checked':'')+chkAttr+' style="margin-top:3px;">'
           +'<span class="'+cls+'" id="cl-label-'+item.id+'">'+esc(item.label)+'</span>'
+          +'</div>'
+          +memoHtml
           +'</div>';
       }).join('');
 
-      var memoContent = memo && memo.content ? esc(memo.content) : '';
-      var memoClass = memoContent ? 'memo-box' : 'memo-box empty-memo';
-      var memoDisplay = memoContent || 'メモなし';
-      var memoId = memo ? memo.id : null;
-      var editMemoBtn = isAdmin
-        ? '<button class="btn-edit" style="margin-left:8px;" onclick="openMemoEdit(\''+r.id+'\','+(memoId?'\''+memoId+'\'':'null')+',`'+( memo&&memo.content ? memo.content.replace(/`/g,"'") : '')+'`)">✏️ 編集</button>'
+      // 編集ボタン（管理者のみ）
+      var editBtn = isAdmin
+        ? '<button class="btn-edit" onclick="showEditLeadersForm(\''+r.id+'\')">✏️ 編集</button>'
+          +'<button class="btn-edit" style="border-color:var(--danger);color:var(--danger);" onclick="deleteLeadersMTG(\''+r.id+'\')">🗑 削除</button>'
         : '';
 
       html += '<div class="leaders-card">'
         +'<div class="leaders-card-header">'
         +'<div class="leaders-card-title">👑 '+ds+' リーダーズMTG</div>'
-        +'<div style="display:flex;align-items:center;gap:8px;">'
-        +(isAdmin?'<button class="btn-edit" onclick="deleteLeadersMTG(\''+r.id+'\')">🗑 削除</button>':'')
-        +'<span class="leaders-card-date">'+r.mtg_date+'</span>'
+        +'<div style="display:flex;align-items:center;gap:8px;">'+editBtn+'<span class="leaders-card-date">'+r.mtg_date+'</span></div>'
         +'</div>'
-        +'</div>'
-        +'<div class="leaders-card-body">'
-        +'<div class="leaders-section-title">✅ 確認事項</div>'
+        +'<div class="leaders-card-body" id="leaders-edit-area-'+r.id+'">'
+        +'<div class="leaders-section-title">✅ 確認事項 / メモ</div>'
         +(checkHtml||'<p style="font-size:13px;color:var(--text-muted);">確認事項なし</p>')
-        +'<div class="leaders-section-title" style="display:flex;align-items:center;justify-content:space-between;">📝 メモ'+editMemoBtn+'</div>'
-        +'<div class="'+memoClass+'" id="memo-display-'+r.id+'">'+memoDisplay+'</div>'
-        +'<div id="memo-edit-'+r.id+'" style="display:none;">'
-        +'<textarea id="memo-text-'+r.id+'" rows="5" style="width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:10px;border-radius:8px;font-family:\'Noto Sans JP\',sans-serif;font-size:13px;outline:none;resize:vertical;margin-bottom:8px;"></textarea>'
-        +'<div style="display:flex;gap:8px;justify-content:flex-end;">'
-        +'<button class="btn-cancel" onclick="closeMemoEdit(\''+r.id+'\')">キャンセル</button>'
-        +'<button class="btn-save" onclick="saveMemo(\''+r.id+'\')">💾 保存</button>'
-        +'</div></div>'
         +'</div></div>';
     });
   }
   cont.innerHTML = html;
 }
 
+/* 新規作成フォーム */
 function showLeadersForm() {
   var wrap = document.getElementById('leaders-form-wrap');
   wrap.style.display = 'block';
   var today = new Date();
   var dateVal = today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
-  wrap.innerHTML = '<div class="leaders-form">'
+  wrap.innerHTML = '<div class="leaders-form" id="lf-form">'
     +'<div class="leaders-form-title">新規リーダーズMTG作成</div>'
     +'<div class="field"><label>開催日</label><input type="date" id="lf-date" value="'+dateVal+'"></div>'
-    +'<div class="leaders-section-title">✅ 確認事項（チェックボックス）</div>'
+    +'<div class="leaders-section-title">✅ 確認事項</div>'
     +'<div id="lf-items"></div>'
-    +'<button class="btn-add-item" onclick="addCheckItem()">＋ 項目を追加</button>'
+    +'<button class="btn-add-item" onclick="addCheckItem(\'lf-items\')">＋ 項目を追加</button>'
     +'<div class="btn-row" style="margin-top:20px;">'
     +'<button class="btn-cancel" onclick="hideLeadersForm()">キャンセル</button>'
     +'<button class="btn-save" onclick="saveLeadersMTG()">💾 保存する</button>'
     +'</div></div>';
-  addCheckItem();
+  addCheckItem('lf-items');
+}
+
+/* 既存MTG編集フォーム */
+function showEditLeadersForm(mtgId) {
+  sbClient.from('leaders_mtg')
+    .select('*, leaders_checklist(*)')
+    .eq('id', mtgId).single()
+    .then(function(res){
+      if(res.error){ alert('読み込みエラー'); return; }
+      var r = res.data;
+      var checklist = (r.leaders_checklist||[]).sort(function(a,b){return a.sort_order-b.sort_order;});
+      var area = document.getElementById('leaders-edit-area-'+mtgId);
+      var itemsHtml = checklist.map(function(item,i){
+        return '<div class="checklist-edit-item" id="ef-item-'+item.id+'" data-existing-id="'+item.id+'">'
+          +'<input type="text" value="'+item.label.replace(/"/g,'&quot;')+'" id="ef-label-'+item.id+'">'
+          +'<button class="btn-remove-item" onclick="removeCheckItem(\'ef-item-'+item.id+'\')">✕</button>'
+          +'</div>';
+      }).join('');
+      area.innerHTML = '<div class="leaders-form" style="box-shadow:none;padding:0;">'
+        +'<div class="leaders-section-title">✅ 確認事項を編集</div>'
+        +'<div id="ef-items-'+mtgId+'">'+itemsHtml+'</div>'
+        +'<button class="btn-add-item" onclick="addCheckItem(\'ef-items-'+mtgId+'\')">＋ 項目を追加</button>'
+        +'<div class="btn-row" style="margin-top:16px;">'
+        +'<button class="btn-cancel" onclick="loadLeadersMTG()">キャンセル</button>'
+        +'<button class="btn-save" onclick="saveEditLeaders(\''+mtgId+'\')">💾 保存する</button>'
+        +'</div></div>';
+    });
+}
+
+function saveEditLeaders(mtgId) {
+  var container = document.getElementById('ef-items-'+mtgId);
+  var items = [];
+  container.querySelectorAll('.checklist-edit-item').forEach(function(el,i){
+    var inp = el.querySelector('input[type=text]');
+    var existingId = el.getAttribute('data-existing-id');
+    if(inp && inp.value.trim()){
+      items.push({ existingId: existingId||null, label: inp.value.trim(), sort_order: i });
+    }
+  });
+
+  // 既存を全削除して再挿入
+  sbClient.from('leaders_checklist').delete().eq('mtg_id', mtgId).then(function(r1){
+    if(r1.error) throw r1.error;
+    if(items.length === 0) { loadLeadersMTG(); return; }
+    var rows = items.map(function(item){
+      return { mtg_id: mtgId, label: item.label, sort_order: item.sort_order, checked: false };
+    });
+    return sbClient.from('leaders_checklist').insert(rows);
+  }).then(function(r2){
+    if(r2&&r2.error) throw r2.error;
+    showAlert('leaders-alert','success','✅ 確認事項を更新しました！');
+    loadLeadersMTG();
+  }).catch(function(e){ alert('更新エラー: '+(e.message||e)); });
 }
 
 function hideLeadersForm() {
@@ -808,9 +898,10 @@ function hideLeadersForm() {
   if(wrap) wrap.style.display='none';
 }
 
-function addCheckItem() {
-  var cont = document.getElementById('lf-items');
-  var idx = cont.children.length;
+function addCheckItem(containerId) {
+  var cont = document.getElementById(containerId);
+  if(!cont) return;
+  var idx = Date.now();
   var div = document.createElement('div');
   div.className = 'checklist-edit-item';
   div.id = 'lf-item-'+idx;
@@ -835,8 +926,8 @@ function saveLeadersMTG() {
   });
   sbClient.from('leaders_mtg').insert({mtg_date:date}).select().single().then(function(r1){
     if(r1.error) throw r1.error;
+    if(items.length===0){ hideLeadersForm(); showAlert('leaders-alert','success','✅ 作成しました！'); loadLeadersMTG(); return; }
     var rows = items.map(function(item){ return Object.assign({},item,{mtg_id:r1.data.id}); });
-    if(rows.length===0) return {error:null};
     return sbClient.from('leaders_checklist').insert(rows);
   }).then(function(r2){
     if(r2&&r2.error) throw r2.error;
@@ -862,35 +953,31 @@ function toggleCheck(itemId, checkbox) {
   });
 }
 
-function openMemoEdit(mtgId, memoId, currentContent) {
-  var disp = document.getElementById('memo-display-'+mtgId);
-  var editWrap = document.getElementById('memo-edit-'+mtgId);
-  var textarea = document.getElementById('memo-text-'+mtgId);
-  if(disp) disp.style.display='none';
-  if(editWrap) editWrap.style.display='block';
-  if(textarea) textarea.value = currentContent||'';
-  editingMemoId = memoId;
+function openMemoEdit(itemId) {
+  document.getElementById('memo-disp-'+itemId).style.display='none';
+  document.getElementById('memo-edit-wrap-'+itemId).style.display='block';
+  var btn = document.querySelector('[onclick="openMemoEdit(\''+itemId+'\')"]');
+  if(btn) btn.style.display='none';
 }
 
-function closeMemoEdit(mtgId) {
-  var disp = document.getElementById('memo-display-'+mtgId);
-  var editWrap = document.getElementById('memo-edit-'+mtgId);
-  if(disp) disp.style.display='block';
-  if(editWrap) editWrap.style.display='none';
+function closeMemoEdit(itemId) {
+  document.getElementById('memo-disp-'+itemId).style.display='block';
+  document.getElementById('memo-edit-wrap-'+itemId).style.display='none';
+  var btn = document.querySelector('[onclick="openMemoEdit(\''+itemId+'\')"]');
+  if(btn) btn.style.display='inline-block';
 }
 
-function saveMemo(mtgId) {
-  var textarea = document.getElementById('memo-text-'+mtgId);
-  var content = textarea ? textarea.value.trim() : '';
+function saveMemo(itemId, memoId, mtgId) {
+  var ta = document.getElementById('memo-ta-'+itemId);
+  var content = ta ? ta.value.trim() : '';
   var promise;
-  if(editingMemoId) {
-    promise = sbClient.from('leaders_memo').update({content:content}).eq('id',editingMemoId);
+  if(memoId && memoId !== 'null') {
+    promise = sbClient.from('leaders_memo').update({content:content}).eq('id',memoId);
   } else {
-    promise = sbClient.from('leaders_memo').insert({mtg_id:mtgId, content:content});
+    promise = sbClient.from('leaders_memo').insert({checklist_id:itemId, content:content});
   }
   promise.then(function(res){
     if(res.error){ alert('保存エラー: '+res.error.message); return; }
-    editingMemoId=null;
     loadLeadersMTG();
   });
 }
