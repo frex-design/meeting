@@ -720,7 +720,7 @@ function renderLeadersMTG(records){
         var memo=item.memo||null;
         var memoContent=memo&&memo.content?memo.content:'';
         var cls=item.checked?'checklist-label checked':'checklist-label';
-        var chkAttr=isAdmin?' onchange="toggleCheck(\''+item.id+'\',this)"':' disabled';
+        var chkAttr=isAdmin?' onclick="toggleCheck(\''+item.id+'\',this)"':' disabled';
         var memoDisp='<div class="memo-area">';
         if(isAdmin){
           memoDisp+='<textarea class="memo-box" id="memo-ta-'+item.id+'" data-memo-id="'+(memo?memo.id:'')+'" rows="4" placeholder="メモを入力...">'+memoContent+'</textarea>';
@@ -907,10 +907,15 @@ function toggleLeadersCard(id){
   document.getElementById('icon-'+id).classList.toggle('open');
 }
 function toggleCheck(itemId,checkbox){
-  sbClient.from('leaders_checklist').update({checked:checkbox.checked}).eq('id',itemId).then(function(res){
-    if(res.error){alert('更新エラー');checkbox.checked=!checkbox.checked;return;}
+  var checked=checkbox.checked;
+  sbClient.from('leaders_checklist').update({checked:checked}).eq('id',itemId).then(function(res){
+    if(res.error){alert('更新エラー');checkbox.checked=!checked;return;}
+    // チェック状態をその場で反映（リロードなし）
     var lbl=document.getElementById('cl-label-'+itemId);
-    if(lbl){if(checkbox.checked)lbl.classList.add('checked');else lbl.classList.remove('checked');}
+    if(lbl){
+      if(checked) lbl.classList.add('checked');
+      else lbl.classList.remove('checked');
+    }
   });
 }
 function showAlert(id,type,msg){
